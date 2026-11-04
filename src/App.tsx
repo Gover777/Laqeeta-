@@ -1192,6 +1192,19 @@ export default function App() {
       {/* DEDICATED LOST REPORTS PAGE (المفقودات) */}
       {activeTab === 'lost' && (
         <main className="max-w-7xl mx-auto px-4 md:px-8 py-10 space-y-8">
+          <button
+            type="button"
+            onClick={() => setActiveTab('home')}
+            className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition border cursor-pointer ${
+              isDarkMode
+                ? 'bg-[#19231D] text-[#F0E4CC] border-[#34463A] hover:bg-[#223128]'
+                : 'bg-[#F7F7F3] text-[#173F35] border-[#E3E7E0] hover:bg-[#E3E7E0]'
+            }`}
+          >
+            <ArrowRight className="w-4 h-4 text-[#B99A65]" />
+            <span>رجوع للصفحة الرئيسية</span>
+          </button>
+
           <div className="bg-[#8C2727]/10 border border-[#8C2727]/30 p-6 md:p-8 rounded-3xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-sm">
             <div className="space-y-2">
               <span className="text-xs font-black text-[#8C2727] bg-white px-3 py-1 rounded-full border border-[#8C2727]/30">سجل المفقودات — منصة لقيتة الحضرمية</span>
@@ -1302,6 +1315,19 @@ export default function App() {
       {/* DEDICATED FOUND REPORTS PAGE (الموجودات) */}
       {activeTab === 'found' && (
         <main className="max-w-7xl mx-auto px-4 md:px-8 py-10 space-y-8">
+          <button
+            type="button"
+            onClick={() => setActiveTab('home')}
+            className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition border cursor-pointer ${
+              isDarkMode
+                ? 'bg-[#19231D] text-[#F0E4CC] border-[#34463A] hover:bg-[#223128]'
+                : 'bg-[#F7F7F3] text-[#173F35] border-[#E3E7E0] hover:bg-[#E3E7E0]'
+            }`}
+          >
+            <ArrowRight className="w-4 h-4 text-[#B99A65]" />
+            <span>رجوع للصفحة الرئيسية</span>
+          </button>
+
           <div className="bg-[#173F35]/10 border border-[#173F35]/30 p-6 md:p-8 rounded-3xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-sm">
             <div className="space-y-2">
               <span className="text-xs font-black text-[#173F35] bg-white px-3 py-1 rounded-full border border-[#173F35]/30">سجل الموجودات — منصة لقيتة الحضرمية</span>
