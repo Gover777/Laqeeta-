@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block title %}تقييم المستخدم — لقيتة{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <p class="eyebrow">تقييم التجربة والموثوقية</p>
+  <h1>تقييم التعامل بخصوص البلاغ</h1>
+  <p>يساعد تقييمك الصادق في بناء مجتمع آمن وموثوق للمفقودات والموجودات.</p>
+</section>
+
+<div class="card" style="max-width: 650px; margin-inline: auto; padding: 32px; margin-top: 24px;">
+  <div style="background: var(--soft); padding: 16px 20px; border-radius: 14px; margin-bottom: 24px;">
+    <div style="font-size: 13px; color: var(--muted); margin-bottom: 4px;">البلاغ المغلق:</div>
+    <div style="font-weight: 800; color: var(--green); font-size: 1.15rem; margin-bottom: 8px;">{{ report.title }}</div>
+    <div style="font-size: 13px; color: var(--muted);">
+      المستخدم المقيَّم: <b>{{ rated_user.display_name|default:rated_user.email }}</b>
+    </div>
+  </div>
+
+  <form method="post">
+    {% csrf_token %}
+    <div style="margin-bottom: 24px;">
+      <label style="display: block; font-weight: 800; color: var(--green); margin-bottom: 10px; font-size: 1.1rem;">
+        درجة التقييم (من 1 إلى 5 نجوم) <span style="color: var(--danger);">*</span>
+      </label>
+      <div class="rating-options" style="display: flex; flex-direction: column; gap: 8px;">
+        {% for radio in form.score %}
+          <label style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; cursor: pointer; transition: background .15s;">
+            {{ radio.tag }}
+            <span style="font-size: 1.05rem; font-weight: 700; color: var(--gold);">{{ radio.choice_label }}</span>
+          </label>
+        {% endfor %}
+      </div>
+      {% if form.score.errors %}
+        <span class="field-error" style="color: var(--danger); font-size: 13px; display: block; margin-top: 6px;">
+          {{ form.score.errors.0 }}
+        </span>
+      {% endif %}
+    </div>
+
+    <div style="margin-bottom: 24px;">
+      <label for="{{ form.comment.id_for_label }}" style="display: block; font-weight: 700; margin-bottom: 8px;">
+        ملاحظة أو تعليق حول التجربة (اختياري)
+      </label>
+      {{ form.comment }}
+      {% if form.comment.errors %}
+        <span class="field-error" style="color: var(--danger); font-size: 13px; display: block; margin-top: 4px;">
+          {{ form.comment.errors.0 }}
+        </span>
+      {% endif %}
+      <small class="muted" style="display: block; margin-top: 4px;">
+        لا تذكر أرقام هواتف أو تفاصيل بنكية أو معلومات شخصية حساسة.
+      </small>
+    </div>
+
+    <div class="actions" style="display: flex; gap: 12px;">
+      <button class="button primary" type="submit">إرسال التقييم ✓</button>
+      <a class="button outline" href="{% url 'report_detail' report.pk %}">إلغاء</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

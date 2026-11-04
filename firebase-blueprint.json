@@ -1,0 +1,71 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User account profile document in Firestore",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Firebase Auth UID" },
+        "name": { "type": "string", "description": "Full name of the user", "maxLength": 100 },
+        "email": { "type": "string", "description": "Email address", "maxLength": 150 },
+        "isVerified": { "type": "boolean", "description": "Whether the user account is verified" },
+        "dateJoined": { "type": "string", "description": "ISO date string of account creation" },
+        "ratingsCount": { "type": "number", "description": "Total number of completed ratings received" },
+        "averageRating": { "type": "number", "description": "Average rating score from 0 to 5" }
+      },
+      "required": ["id", "name", "email", "isVerified", "dateJoined"]
+    },
+    "ReportItem": {
+      "title": "ReportItem",
+      "description": "Lost or found report submitted by a user",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique report ID" },
+        "title": { "type": "string", "description": "Report title", "maxLength": 150 },
+        "kind": { "type": "string", "enum": ["lost", "found"], "description": "Whether the item is lost or found" },
+        "category": { "type": "string", "description": "Item category", "maxLength": 100 },
+        "governorate": { "type": "string", "description": "Governorate in Yemen", "maxLength": 100 },
+        "city": { "type": "string", "description": "City or district", "maxLength": 150 },
+        "eventDate": { "type": "string", "description": "Date lost or found" },
+        "status": { "type": "string", "enum": ["published", "closed", "pending"], "description": "Report lifecycle status" },
+        "publicDescription": { "type": "string", "description": "Public description of item", "maxLength": 2000 },
+        "ownerId": { "type": "string", "description": "Firebase Auth UID of the report owner" },
+        "ownerName": { "type": "string", "description": "Name of the report owner", "maxLength": 100 },
+        "ownerEmail": { "type": "string", "description": "Email of report owner", "maxLength": 150 },
+        "involvedClaimantId": { "type": "string", "description": "Optional claimant UID" },
+        "createdAt": { "type": "string", "description": "Creation timestamp" }
+      },
+      "required": ["id", "title", "kind", "category", "governorate", "city", "eventDate", "status", "publicDescription", "ownerId", "ownerName"]
+    },
+    "ReviewItem": {
+      "title": "ReviewItem",
+      "description": "Review/Rating left by a user for another user after report closure",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique review ID" },
+        "targetUserId": { "type": "string", "description": "UID of the user being rated" },
+        "raterUserId": { "type": "string", "description": "UID of the user leaving the rating" },
+        "raterName": { "type": "string", "description": "Name of the rater", "maxLength": 100 },
+        "reportTitle": { "type": "string", "description": "Title of report related to this review", "maxLength": 150 },
+        "score": { "type": "number", "description": "Rating score between 1 and 5" },
+        "comment": { "type": "string", "description": "Review comment", "maxLength": 1000 },
+        "date": { "type": "string", "description": "Date review was submitted" }
+      },
+      "required": ["id", "targetUserId", "raterUserId", "raterName", "reportTitle", "score", "comment", "date"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "Public user profiles"
+    },
+    "/reports/{reportId}": {
+      "schema": { "$ref": "#/entities/ReportItem" },
+      "description": "Lost and found reports"
+    },
+    "/reviews/{reviewId}": {
+      "schema": { "$ref": "#/entities/ReviewItem" },
+      "description": "Ratings and reviews submitted for users"
+    }
+  }
+}

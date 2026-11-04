@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}إنشاء حساب جديد — منصة لقيتة{% endblock %}
+
+{% block content %}
+<section class="page-heading">
+  <p class="eyebrow">عضوية جديدة</p>
+  <h1>إنشاء حساب موثق في لقيتة</h1>
+  <p>سجّل حسابك للإبلاغ عن مفقوداتك أو موجودات عثرت عليها، والتواصل الآمن لتبادل الأمانات والتقييمات الحقيقية.</p>
+</section>
+
+<div class="card" style="max-width: 540px; margin-inline: auto; padding: 32px 28px; margin-top: 24px; border: 1px solid var(--line);">
+  <form method="post" action="{% url 'signup' %}">
+    {% csrf_token %}
+    {% include 'core/form_fields.html' with form=form %}
+
+    <div style="margin-top: 24px; display: flex; flex-direction: column; gap: 12px;">
+      <button class="button primary" type="submit" style="width: 100%; min-height: 48px; font-size: 15px; font-weight: 800;">
+        تأكيد وإنشاء الحساب
+      </button>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 14px; border-top: 1px solid var(--line); font-size: 13px;">
+        <span class="muted">لديك حساب بالفعل؟</span>
+        <a class="button outline small" href="{% url 'login' %}">تسجيل الدخول</a>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}

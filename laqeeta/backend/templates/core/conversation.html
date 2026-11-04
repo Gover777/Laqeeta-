@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block title %}محادثة بخصوص: {{ thread.report.title }} — لقيتة{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <p class="eyebrow">محادثة خاصة وآمنة</p>
+  <h1>{{ thread.report.title }}</h1>
+  <div style="display: flex; align-items: center; gap: 12px; margin-top: 6px; flex-wrap: wrap;">
+    <span class="muted">الطرف الآخر:</span>
+    <a href="{% url 'user_profile' other_user.pk %}" style="font-weight: 800;">
+      {{ other_user.display_name|default:other_user.email }}
+    </a>
+    {% if other_user.average_rating %}
+      <span style="color: var(--gold); font-weight: 800; font-size: 14px;">
+        (★ {{ other_user.average_rating }} · {{ other_user.ratings_count }} تقييم)
+      </span>
+    {% endif %}
+  </div>
+</section>
+
+<!-- If report is closed: show rating prompt -->
+{% if thread.report.status == 'closed' %}
+  <div class="card" style="margin-block: 16px 24px; padding: 18px 22px; background: color-mix(in srgb, var(--sand) 35%, var(--surface)); border: 1px solid var(--gold);">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+      <div>
+        <strong style="color: var(--green); display: block; font-size: 1.05rem;">تم إغلاق البلاغ المرتبط بهذه المحادثة</strong>
+        <span class="muted" style="font-size: 13px;">شارك برأيك وتقييمك لتعاملك مع الطرف الآخر لمساعدة المجتمع.</span>
+      </div>
+      {% if can_rate %}
+        <a class="button primary small" href="{% url 'submit_rating' thread.report.pk other_user.pk %}">
+          تقييم {{ other_user.display_name|default:other_user.email }} ★
+        </a>
+      {% elif existing_rating %}
+        <span style="font-weight: 700; color: var(--gold); font-size: 14px;">
+          لقد قيّمت هذا المستخدم بـ {{ existing_rating.score }} / 5 ★
+        </span>
+      {% endif %}
+    </div>
+  </div>
+{% endif %}
+
+<div class="thread">
+  {% for msg in messages_list %}
+    <article class="message {% if msg.sender_id == request.user.pk %}mine{% endif %}">
+      <b>{% if msg.sender_id == request.user.pk %}أنت{% else %}{{ msg.sender.display_name|default:"مشارك" }}{% endif %}</b>
+      <p>{{ msg.body|linebreaksbr }}</p>
+      <small>{{ msg.created_at|date:"Y-m-d H:i" }}</small>
+    </article>
+  {% empty %}
+    <p class="muted">ابدأ بمحادثة واضحة ومحترمة. لا تشارك بيانات بنكية أو حساسة.</p>
+  {% endfor %}
+</div>
+
+{% if thread.report.status != 'closed' %}
+  <form method="post" action="{% url 'message_send' thread.pk %}" class="form-card" style="margin-top: 24px;">
+    {% csrf_token %}
+    {% include 'core/form_fields.html' with form=form %}
+    <button class="button primary">إرسال الرسالة</button>
+  </form>
+{% else %}
+  <div style="padding: 14px; background: var(--soft); border-radius: 12px; font-size: 14px; color: var(--muted); margin-top: 20px;">
+    أُغلقت هذه المحادثة بعد إغلاق البلاغ بنجاح.
+  </div>
+{% endif %}
+
+<div style="margin-top: 28px; padding-top: 18px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+  <form method="post" action="{% url 'block_user' thread.pk %}" class="block-form" style="margin: 0;">
+    {% csrf_token %}
+    <label style="font-size: 13px;">
+      <input type="checkbox" name="confirm" value="on" required> أؤكد حظر هذا المستخدم ومنع الرسائل المتبادلة.
+    </label>
+    <button class="button danger small" style="margin-inline-start: 10px;">حظر المستخدم</button>
+  </form>
+  <a class="button outline small" href="{% url 'inbox_list' %}">العودة للرسائل</a>
+</div>
+{% endblock %}

@@ -1,0 +1,7 @@
+{
+  "name": "Laqeeta | لقيتة",
+  "description": "منصة حضرمية للمفقودات والموجودات تجمع أصحاب الأشياء المفقودة بمن عثر عليها مع مراعاة الخصوصية والسلامة ونظام تقييم موثق.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+

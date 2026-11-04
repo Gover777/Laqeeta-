@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% block title %}{{ report.title }} — لقيتة{% endblock %}
+{% block content %}
+<article class="detail">
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px;">
+    <div>
+      <p class="eyebrow">{{ report.get_kind_display }} · {{ report.category.name_ar }}</p>
+      <h1>{{ report.title }}</h1>
+    </div>
+    <div>
+      <span class="status-pill" style="font-size: 13px; font-weight: 700; color: {% if report.status == 'published' %}var(--green){% elif report.status == 'closed' %}var(--muted){% else %}var(--gold){% endif %};">
+        {{ report.get_status_display }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Publisher Info & Rating -->
+  <div style="margin-block: 8px 16px; padding: 12px 16px; background: var(--soft); border-radius: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+    <div>
+      <span class="muted" style="font-size: 13px;">صاحب البلاغ:</span>
+      <a href="{% url 'user_profile' report.owner.pk %}" style="font-weight: 800; margin-inline: 4px;">
+        {{ report.owner.display_name|default:report.owner.email }}
+      </a>
+      {% if report.owner.average_rating %}
+        <span style="color: var(--gold); font-weight: 800; font-size: 13px;">
+          (★ {{ report.owner.average_rating }} · {{ report.owner.ratings_count }} تقييم)
+        </span>
+      {% else %}
+        <span class="muted" style="font-size: 12px;">(عضو جديد)</span>
+      {% endif %}
+    </div>
+    <a class="button outline small" style="min-height: 32px; padding: 4px 12px; font-size: 12px;" href="{% url 'user_profile' report.owner.pk %}">
+      عرض ملف المستخدم
+    </a>
+  </div>
+
+  <p class="lead">{{ report.public_description|linebreaksbr }}</p>
+
+  <dl>
+    <dt>المنطقة العامة</dt>
+    <dd>{{ report.governorate }}، {{ report.city }}</dd>
+    <dt>تاريخ الواقعة</dt>
+    <dd>{{ report.event_date|date:"Y-m-d" }}</dd>
+    {% if report.published_at %}
+      <dt>تاريخ النشر</dt>
+      <dd>{{ report.published_at|date:"Y-m-d" }}</dd>
+    {% endif %}
+    {% if report.status == 'closed' and report.closed_at %}
+      <dt>تاريخ الإغلاق</dt>
+      <dd>{{ report.closed_at|date:"Y-m-d" }}</dd>
+    {% endif %}
+  </dl>
+
+  <!-- Closed Report & Rating Section -->
+  {% if report.status == 'closed' %}
+    <div class="card" style="margin-block: 24px; padding: 24px; border: 2px solid color-mix(in srgb, var(--green) 35%, var(--line)); background: color-mix(in srgb, var(--sand) 30%, var(--surface));">
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+        <span style="font-size: 1.5rem; color: var(--green);">✓</span>
+        <h2 style="margin: 0; color: var(--green); font-size: 1.25rem;">تم إغلاق هذا البلاغ بنجاح</h2>
+      </div>
+      <p style="margin: 0 0 14px; font-size: 14px; color: var(--ink);">
+        اكتملت عملية الاستعادة والتسليم. نرجو من الأطراف المشاركة تبادل التقييم لتعزيز الثقة في المجتمع.
+      </p>
+
+      {% if ratable_users %}
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 12px;">
+          <strong style="color: var(--green); font-size: 14px;">يمكنك تقييم الطرف الآخر الآن:</strong>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            {% for u in ratable_users %}
+              <a class="button primary small" href="{% url 'submit_rating' report.pk u.pk %}">
+                تقييم {{ u.display_name|default:u.email }} (1-5 نجوم) ★
+              </a>
+            {% endfor %}
+          </div>
+        </div>
+      {% elif my_rating %}
+        <div style="padding: 10px 14px; background: var(--surface); border-radius: 10px; font-size: 14px; display: inline-block;">
+          لقد قمت بتقييم الطرف الآخر بـ <strong style="color: var(--gold);">{{ my_rating.score }} من 5 نجوم ★</strong>. شكرًا لمساهمتك!
+        </div>
+      {% endif %}
+
+      {% if all_ratings %}
+        <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line);">
+          <strong style="font-size: 13px; color: var(--green); display: block; margin-bottom: 8px;">التقييمات المسجلة لهذا البلاغ:</strong>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            {% for r in all_ratings %}
+              <div style="font-size: 13px; background: var(--surface); padding: 8px 12px; border-radius: 8px;">
+                <b>{{ r.rater.display_name|default:r.rater.email }}</b> قيّم <b>{{ r.rated_user.display_name|default:r.rated_user.email }}</b>:
+                <span style="color: var(--gold); font-weight: 800;">{{ r.score }} / 5 ★</span>
+                {% if r.comment %}<span style="color: var(--muted); margin-inline-start: 8px;">"{{ r.comment }}"</span>{% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  {% else %}
+    <aside class="notice">
+      التطابق لا يثبت الملكية. لا تظهر هنا علامات التحقق السرية أو بيانات التواصل الشخصية أو الموقع الدقيق.
+    </aside>
+
+    {% if public_auth_enabled %}
+      <div class="actions" style="margin-block: 18px; display: flex; flex-direction: column; gap: 10px;">
+        {% if request.user.is_authenticated %}
+          {% if report.kind == 'lost' %}
+            <a class="button primary" href="{% url 'contact_start' report.pk %}">💬 تواصل مع صاحب البلاغ</a>
+          {% else %}
+            <a class="button primary" href="{% url 'contact_start' report.pk %}">💬 تواصل مع الشخص الذي وجده</a>
+          {% endif %}
+        {% else %}
+          {% if report.kind == 'lost' %}
+            <a class="button primary" href="{% url 'login' %}?next={% url 'contact_start' report.pk %}">💬 تواصل مع صاحب البلاغ (تسجيل الدخول)</a>
+          {% else %}
+            <a class="button primary" href="{% url 'login' %}?next={% url 'contact_start' report.pk %}">💬 تواصل مع الشخص الذي وجده (تسجيل الدخول)</a>
+          {% endif %}
+        {% endif %}
+        {% if request.user.is_authenticated %}
+          <a class="button outline" href="{% url 'abuse_report' report.pk %}">الإبلاغ عن محتوى مخالف</a>
+        {% endif %}
+        <button class="button secondary" type="button" onclick="navigator.clipboard.writeText(window.location.href); alert('تم نسخ رابط البلاغ المباشر بنجاح! يمكنك الآن مشاركته عبر الواتساب أو شبكات التواصل.');" style="margin-top: 4px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+          <svg viewBox="0 0 24 24" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2;"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+          مشاركة البلاغ (نسخ الرابط المباشر للواتساب والشبكات)
+        </button>
+      </div>
+    {% endif %}
+  {% endif %}
+
+  <p class="muted" style="font-size: 13px; margin-top: 20px;">
+    اتفق دائمًا على مكان عام وآمن للتسليم. لا تشارك رموز التحقق أو كلمات المرور أو البيانات البنكية.
+  </p>
+</article>
+{% endblock %}

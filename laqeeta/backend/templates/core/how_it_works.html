@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}كيف تعمل المنصة؟ — لقيتة{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <p class="eyebrow">خطوات بسيطة، بوضوح وثقة</p>
+  <h1>كيف تعمل منصة لقيتة؟</h1>
+  <p>مسار مدروس يربط بين أصحاب المفقودات ومن عثر عليها بكل شفافية، مع حماية بيانات الطرفين والتحقق الدقيق قبل التسليم.</p>
+</section>
+
+<div class="steps" style="grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; margin-top: 32px;">
+  <article class="card" style="position: relative; padding: 28px;">
+    <span class="step-index" style="position: absolute; inset-inline-start: 22px; top: 18px; color: var(--gold); font-size: 1.1rem; font-weight: 800;">01</span>
+    <span class="step-icon" aria-hidden="true" style="margin-bottom: 16px;">
+      <svg viewBox="0 0 32 32"><path d="M8 5h12l5 5v17H8z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 5v6h5M12 16h9M12 20h9" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+    </span>
+    <h2 style="color: var(--green); font-size: 1.25rem; margin: 0 0 10px;">أبلغ أو ابحث</h2>
+    <p>ابحث بسهولة عما فقدته باستخدام محرك البحث حسب التصنيف والمدينة، أو انشر بلاغًا جديدًا عن غرض عثرت عليه أو فقدته بوصف عام واضح.</p>
+  </article>
+
+  <article class="card" style="position: relative; padding: 28px;">
+    <span class="step-index" style="position: absolute; inset-inline-start: 22px; top: 18px; color: var(--gold); font-size: 1.1rem; font-weight: 800;">02</span>
+    <span class="step-icon" aria-hidden="true" style="margin-bottom: 16px; background: var(--sand);">
+      <svg viewBox="0 0 32 32"><path d="M5 7h22v16H15l-7 5v-5H5z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 13h12M10 17h8" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+    </span>
+    <h2 style="color: var(--green); font-size: 1.25rem; margin: 0 0 10px;">تواصل بأمان</h2>
+    <p>ابدأ محادثة داخلية عبر المنصة مع صاحب البلاغ دون الحاجة إلى نشر بياناتك الشخصية أو رقم هاتفك حتى يتم تأكيد التطابق الأولي.</p>
+  </article>
+
+  <article class="card" style="position: relative; padding: 28px;">
+    <span class="step-index" style="position: absolute; inset-inline-start: 22px; top: 18px; color: var(--gold); font-size: 1.1rem; font-weight: 800;">03</span>
+    <span class="step-icon" aria-hidden="true" style="margin-bottom: 16px;">
+      <svg viewBox="0 0 32 32"><path d="m16 4 10 4v8c0 7-4 11-10 14C10 27 6 23 6 16V8z" fill="none" stroke="currentColor" stroke-width="2"/><path d="m11 16 3 3 7-8" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+    </span>
+    <h2 style="color: var(--green); font-size: 1.25rem; margin: 0 0 10px;">تحقق قبل التسليم</h2>
+    <p>اطرح أسئلة دقيقة حول تفاصيل سرية لا تظهر في الوصف العام (مثل رقم أو نقش أو محتويات)، ثم اتفق على موعد ومكان عام وآمن للتسليم.</p>
+  </article>
+</div>
+
+<div class="card" style="margin-top: 36px; padding: 30px; background: var(--soft);">
+  <h2 style="color: var(--green); margin-top: 0;">دور المراجعة والإشراف في لقيتة</h2>
+  <p style="color: var(--muted); line-height: 1.8;">لا يظهر أي بلاغ على المنصة مباشرة؛ يمر كل بلاغ بمراجعة دقيقة للتأكد من خلوه من المحتوى المخالف أو نشر وثائق حساسة، وحفظ العلامات السرية بشكل منفصل. هذا يحمي الجميع ويعزز مصداقية البلاغات.</p>
+</div>
+
+<div class="actions" style="margin-top: 32px;">
+  <a class="button primary" href="{% url 'report_create' %}?kind=lost">أبلغ عن مفقود</a>
+  <a class="button secondary" href="{% url 'report_create' %}?kind=found">أبلغ عن شيء وجدته</a>
+  <a class="button outline" href="{% url 'safety_guide' %}">إرشادات السلامة</a>
+</div>
+{% endblock %}

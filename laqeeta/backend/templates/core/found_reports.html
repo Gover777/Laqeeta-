@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block title %}الموجودات — لقيتة{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <p class="eyebrow">سجل الموجودات</p>
+  <h1>الأشياء المعثور عليها</h1>
+  <p>استعرض البلاغات المنشورة عن الأشياء التي عثر عليها الآخرون للتعرف على مقتنياتك واستعادتها بأمان.</p>
+</section>
+
+<form method="get" class="filter-panel">
+  <div class="grid">
+
+    <div>
+      <label for="category">التصنيف</label>
+      <select id="category" name="category">
+        <option value="">كل التصنيفات</option>
+        {% for c in categories %}
+          <option value="{{ c.slug }}" {% if filters.category == c.slug %}selected{% endif %}>{{ c.name_ar }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="governorate">المحافظة</label>
+      <input id="governorate" name="governorate" placeholder="المحافظة" value="{{ filters.governorate }}">
+    </div>
+    <div>
+      <label for="city">المدينة</label>
+      <input id="city" name="city" placeholder="المدينة أو المنطقة" value="{{ filters.city }}">
+    </div>
+  </div>
+  <div class="actions">
+    <button class="button primary" type="submit">تصفية النتائج</button>
+    <a class="button outline" href="{% url 'found_reports' %}">مسح المرشحات</a>
+    <a class="button secondary" href="{% url 'report_create' %}?kind=found">أبلغ عن شيء وجدته +</a>
+  </div>
+</form>
+
+{% if results %}
+  <div class="cards">
+    {% for report in results %}
+      {% include 'core/report_card.html' with report=report %}
+    {% endfor %}
+  </div>
+  <nav class="pagination" aria-label="صفحات النتائج">
+    {% if results.has_previous %}
+      <a href="?q={{ filters.q|urlencode }}&category={{ filters.category }}&governorate={{ filters.governorate|urlencode }}&city={{ filters.city|urlencode }}&page={{ results.previous_page_number }}">السابق</a>
+    {% endif %}
+    <span>صفحة {{ results.number }} من {{ results.paginator.num_pages }}</span>
+    {% if results.has_next %}
+      <a href="?q={{ filters.q|urlencode }}&category={{ filters.category }}&governorate={{ filters.governorate|urlencode }}&city={{ filters.city|urlencode }}&page={{ results.next_page_number }}">التالي</a>
+    {% endif %}
+  </nav>
+{% else %}
+  <div class="empty">
+    <span class="empty-icon" aria-hidden="true">
+      <svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="11" fill="none" stroke="currentColor" stroke-width="2"/><path d="m11 16 3 3 7-7" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+    </span>
+    <h2>لا يوجد موجودات حالياً</h2>
+    <p>فارغ — لا يوجد أي موجودات مسجلة حاليًا في المنصة.</p>
+    <div style="margin-top: 14px;">
+      <a class="button primary" href="{% url 'report_create' %}?kind=found">أبلغ عن شيء عثرت عليه +</a>
+    </div>
+  </div>
+{% endif %}
+{% endblock %}

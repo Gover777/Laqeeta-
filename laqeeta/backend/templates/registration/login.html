@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block title %}تسجيل الدخول — منصة لقيتة{% endblock %}
+
+{% block content %}
+<section class="page-heading">
+  <p class="eyebrow">بوابة الدخول الموثقة</p>
+  <h1>تسجيل الدخول إلى حسابك</h1>
+  <p>أدخل بيانات حسابك لإدارة بلاغاتك، وتأكيد استلام الأغراض، ومتابعة التقييمات الحقيقية.</p>
+</section>
+
+<div class="card" style="max-width: 520px; margin-inline: auto; padding: 32px 28px; margin-top: 24px; border: 1px solid var(--line);">
+  <div style="background: var(--soft); border-left: 4px solid var(--green); border-right: 4px solid var(--green); padding: 14px 18px; border-radius: 10px; margin-bottom: 24px; font-size: 13px; line-height: 1.7;">
+    <strong style="color: var(--green); display: block; margin-bottom: 4px;">ضمان المصداقية والأمان:</strong>
+    التقييمات في منصة لقيتة حقيقية بنسبة 100% ومقتصرة على المستخدمين الذين أبلغوا عن مفقوداتهم وأكدوا استلامها الفعلي بعد مطابقة علامات التحقق السرية. تم استبعاد أي تقييمات أو حسابات وهمية.
+  </div>
+
+  <form method="post" action="{% url 'login' %}">
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+      <div style="background: color-mix(in srgb, var(--danger) 15%, var(--surface)); color: var(--danger); padding: 12px 16px; border-radius: 10px; font-size: 13px; font-weight: 700; margin-bottom: 20px;">
+        {% for error in form.non_field_errors %}
+          <div>{{ error }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <div style="margin-bottom: 20px;">
+      <label for="{{ form.username.id_for_label }}" style="display: block; font-weight: 700; color: var(--green); margin-bottom: 8px; font-size: 14px;">
+        {{ form.username.label }} <span style="color: var(--danger);">*</span>
+      </label>
+      {{ form.username }}
+      {% if form.username.errors %}
+        <span class="field-error" style="color: var(--danger); font-size: 13px; display: block; margin-top: 4px;">
+          {{ form.username.errors.0 }}
+        </span>
+      {% endif %}
+    </div>
+
+    <div style="margin-bottom: 24px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <label for="{{ form.password.id_for_label }}" style="font-weight: 700; color: var(--green); font-size: 14px; margin: 0;">
+          {{ form.password.label }} <span style="color: var(--danger);">*</span>
+        </label>
+        <a href="{% url 'password_reset' %}" style="font-size: 12px; color: var(--muted); text-decoration: underline;">
+          نسيت كلمة المرور؟
+        </a>
+      </div>
+      {{ form.password }}
+      {% if form.password.errors %}
+        <span class="field-error" style="color: var(--danger); font-size: 13px; display: block; margin-top: 4px;">
+          {{ form.password.errors.0 }}
+        </span>
+      {% endif %}
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <button class="button primary" type="submit" style="width: 100%; min-height: 48px; font-size: 15px; font-weight: 800;">
+        تسجيل الدخول ✓
+      </button>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 14px; border-top: 1px solid var(--line); font-size: 13px; margin-top: 6px;">
+        <span class="muted">ليس لديك حساب بعد؟</span>
+        <a class="button outline small" href="{% url 'signup' %}">
+          إنشاء حساب جديد
+        </a>
+      </div>
+
+      <div style="text-align: center; margin-top: 4px;">
+        <a href="{% url 'resend_verification' %}" style="font-size: 12px; color: var(--muted); text-decoration: underline;">
+          لم يصلك رابط تفعيل البريد؟ أعد الإرسال
+        </a>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}

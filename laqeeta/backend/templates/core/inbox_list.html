@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}الرسائل الداخلية — لقيتة{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <p class="eyebrow">صندوق الوارد</p>
+  <h1>الرسائل الداخلية</h1>
+  <p>قائمة المحادثات الخاصة المرتبطة ببلاغاتك أو البلاغات التي تواصلت بشأنها.</p>
+</section>
+
+{% if conversations %}
+  <div class="cards" style="grid-template-columns: 1fr; gap: 14px; margin-top: 20px;">
+    {% for conv in conversations %}
+      <article class="card" style="display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;">
+        <div>
+          <span class="eyebrow" style="margin-bottom: 4px;">بلاغ: {{ conv.report.title }}</span>
+          <h2 style="margin: 0; color: var(--green); font-size: 1.2rem;">
+            محادثة مع: {% if request.user == conv.claimant %}{{ conv.owner.display_name|default:conv.owner.email }}{% else %}{{ conv.claimant.display_name|default:conv.claimant.email }}{% endif %}
+          </h2>
+          <small class="muted">آخر تحديث: {{ conv.updated_at|date:"Y-m-d H:i" }}</small>
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <a class="button primary small" href="{% url 'conversation' conv.pk %}">فتح المحادثة ←</a>
+          <a class="button outline small" href="{% url 'report_detail' conv.report.pk %}">عرض البلاغ</a>
+        </div>
+      </article>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty" style="margin-top: 24px;">
+    <span class="empty-icon" aria-hidden="true">
+      <svg viewBox="0 0 32 32"><path d="M5 7h22v16H15l-7 5v-5H5z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 13h12M10 17h8" stroke="currentColor" stroke-width="2"/></svg>
+    </span>
+    <h2>لا توجد محادثات حتى الآن</h2>
+    <p>عندما تبدأ بالتواصل حول غرض منشور أو يتواصل معك أحد بخصوص بلاغك، ستظهر الرسائل هنا.</p>
+    <div style="margin-top: 16px;">
+      <a class="button primary" href="{% url 'search' %}">تصفح البلاغات</a>
+    </div>
+  </div>
+{% endif %}
+{% endblock %}

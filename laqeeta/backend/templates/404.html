@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}الصفحة غير موجودة (404) — لقيتة{% endblock %}
+{% block content %}
+<section class="empty" style="min-height: 380px; margin-block: 40px; padding: 48px 24px;">
+  <span class="empty-icon" aria-hidden="true" style="width: 80px; height: 80px; margin-bottom: 20px;">
+    <svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="12" fill="none" stroke="currentColor" stroke-width="2"/><path d="m11 11 10 10M21 11 11 21" stroke="currentColor" stroke-width="2"/></svg>
+  </span>
+  <h1 style="color: var(--green); font-size: 2rem; margin: 0 0 10px;">الصفحة المطلوبة غير موجودة (404)</h1>
+  <p style="max-width: 500px; color: var(--muted); font-size: 1.1rem; line-height: 1.8;">
+    ربما تم نقل الصفحة أو حذف البلاغ أو أن الرابط غير صحيح. لا تقلق، يمكنك البحث في البلاغات المتاحة أو العودة للرئيسية.
+  </p>
+  <div class="actions" style="margin-top: 24px; gap: 14px;">
+    <a class="button primary" href="{% url 'home' %}">العودة للرئيسية</a>
+    <a class="button outline" href="{% url 'search' %}">البحث في البلاغات</a>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}إعدادات الحساب — لقيتة{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <p class="eyebrow">الملف الشخصي</p>
+  <h1>إعدادات الحساب</h1>
+  <p>إدارة بيانات حسابك وتفضيلات الأمان في منصة لقيتة.</p>
+</section>
+
+<div class="card" style="max-width: 650px; margin-inline: auto; padding: 30px; margin-top: 24px;">
+  <form method="post">
+    {% csrf_token %}
+    <div style="margin-bottom: 20px;">
+      <label style="display: block; font-weight: 700; margin-bottom: 6px;">البريد الإلكتروني</label>
+      <input type="text" value="{{ request.user.email }}" disabled style="background: var(--soft); opacity: .85; cursor: not-allowed;">
+      <small class="muted" style="display: block; margin-top: 4px;">البريد الإلكتروني أساسي لتوثيق الهوية والتحقق ولا يمكن تغييره مباشرة.</small>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+      <label for="{{ form.display_name.id_for_label }}" style="display: block; font-weight: 700; margin-bottom: 6px;">الاسم المعروض</label>
+      {{ form.display_name }}
+      {% if form.display_name.errors %}
+        <span class="field-error" style="color: var(--danger); font-size: 13px;">{{ form.display_name.errors.0 }}</span>
+      {% endif %}
+      <small class="muted" style="display: block; margin-top: 4px;">يظهر هذا الاسم في محادثاتك مع المستخدمين الآخرين.</small>
+    </div>
+
+    <div style="margin-bottom: 24px; padding: 14px 16px; background: var(--soft); border-radius: 12px; font-size: 14px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+        <span>حالة توثيق البريد:</span>
+        <span style="font-weight: 800; color: {% if request.user.is_verified %}var(--green){% else %}var(--danger){% endif %};">
+          {% if request.user.is_verified %}موثّق ✓{% else %}غير موثّق{% endif %}
+        </span>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span>تاريخ الانضمام:</span>
+        <span>{{ request.user.date_joined|date:"Y-m-d" }}</span>
+      </div>
+    </div>
+
+    <div class="actions" style="display: flex; gap: 12px;">
+      <button class="button primary" type="submit">حفظ التعديلات</button>
+      <a class="button outline" href="{% url 'password_reset' %}">تغيير كلمة المرور</a>
+      <a class="button outline" href="{% url 'dashboard' %}">إلغاء</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}إرشادات السلامة والتحقق — لقيتة{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <p class="eyebrow">الخصوصية والسلامة أولًا</p>
+  <h1>إرشادات السلامة والتحقق قبل التسليم</h1>
+  <p>التطابق في الإعلان بداية التحقق، وليس نهايته. إليك أهم القواعد لحماية خصوصيتك وسلامتك عند التعامل مع المفقودات والموجودات.</p>
+</section>
+
+<div class="safety-grid" style="display: grid; gap: 24px; margin-top: 24px;">
+  <article class="card" style="padding: 26px;">
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+      <span class="step-icon" aria-hidden="true" style="margin: 0;">
+        <svg viewBox="0 0 32 32"><path d="M16 4 6 8v8c0 7 4 11 10 14 6-3 10-7 10-14V8z" fill="none" stroke="currentColor" stroke-width="2"/><path d="m11 16 3 3 7-8" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+      </span>
+      <h2 style="margin: 0; color: var(--green); font-size: 1.35rem;">1. احتفظ بتفاصيل التحقق السرية</h2>
+    </div>
+    <p>عند نشر بلاغ عن مفقود أو موجود، لا تذكر جميع العلامات المميزة، أو الأرقام التسلسلية، أو المحتويات الدقيقة، أو الخدوش الفريدة في الوصف العام. احتفظ بهذه التفاصيل في خانة «ملاحظات التحقق السرية» لاختبار مدعي الملكية قبل التسليم.</p>
+  </article>
+
+  <article class="card" style="padding: 26px;">
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+      <span class="step-icon" aria-hidden="true" style="margin: 0;">
+        <svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="12" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 10v7M16 21v1" stroke="currentColor" stroke-width="2"/></svg>
+      </span>
+      <h2 style="margin: 0; color: var(--green); font-size: 1.35rem;">2. لا تنشر بيانات حساسة أو وثائق رسمية علنًا</h2>
+    </div>
+    <p>تجنب نشر صور بطاقات الهوية، أو جوازات السفر، أو البطاقات الائتمانية، أو أرقام الهواتف الشخصية. اذكر فقط نوع الوثيقة والاسم الأول والمحافظة لحماية خصوصية صاحب الغرض من انتحال الشخصية أو الاحتيال.</p>
+  </article>
+
+  <article class="card" style="padding: 26px;">
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+      <span class="step-icon" aria-hidden="true" style="margin: 0;">
+        <svg viewBox="0 0 32 32"><path d="M16 4c-5 0-9 4-9 9 0 7 9 15 9 15s9-8 9-15c0-5-4-9-9-9z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="16" cy="13" r="3" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+      </span>
+      <h2 style="margin: 0; color: var(--green); font-size: 1.35rem;">3. اختر دائمًا مكانًا عامًا ومضيئًا للتسليم</h2>
+    </div>
+    <p>عند الاتفاق على تسليم الغرض بعد التحقق، اختر موقعًا عامًا وواضحًا في وضح النهار (مثل: مركز أمني، بهو جامعة، محطة عامة، أو مركز تجاري). لا توافق أبدًا على اللقاء في أماكن منعزلة أو خاصة، ولا تذهب بمفردك إذا أمكن.</p>
+  </article>
+
+  <article class="card" style="padding: 26px;">
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+      <span class="step-icon" aria-hidden="true" style="margin: 0;">
+        <svg viewBox="0 0 32 32"><path d="M5 8h22v16H5z" fill="none" stroke="currentColor" stroke-width="2"/><path d="m5 8 11 9 11-9" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+      </span>
+      <h2 style="margin: 0; color: var(--green); font-size: 1.35rem;">4. استخدم نظام المراسلة الداخلي في لقيتة</h2>
+    </div>
+    <p>تواصل مع الطرف الآخر من خلال نظام المحادثات الداخلي الآمن بالمنصة دون الحاجة إلى كشف رقم هاتفك أو بريدك الإلكتروني في البداية. يمكنك الإبلاغ عن أي رسالة مشبوهة أو حظر المستخدم بنقرة واحدة.</p>
+  </article>
+</div>
+
+<div class="actions" style="margin-top: 32px;">
+  <a class="button primary" href="{% url 'search' %}">تصفح البلاغات</a>
+  <a class="button outline" href="{% url 'home' %}">العودة للرئيسية</a>
+</div>
+{% endblock %}

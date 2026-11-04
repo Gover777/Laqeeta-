@@ -1,0 +1,56 @@
+{% extends 'base.html' %}{% load static %}{% block content %}
+<section class="hero" aria-labelledby="hero-title">
+  <div class="hero-copy">
+    <p class="eyebrow">للمفقودات والموجودات</p>
+    <h1 id="hero-title">ضــاع  منـــك ؟<br><span>لـقـيـتـــــــــــة</span></h1>
+    <p class="lead">منصة تجمع أصحاب الأشياء المفقودة بمن عثر عليها، وتساعدهم على اتخاذ الخطوة التالية بوضوح وخصوصية.</p>
+    {% if public_auth_enabled %}
+      <div class="actions">
+        <a class="button primary" href="{% url 'report_create' %}?kind=lost">أبلغ عن مفقود <span aria-hidden="true">←</span></a>
+        <a class="button secondary" href="{% url 'report_create' %}?kind=found">أبلغ عن شيء وجدته</a>
+        <a class="button secondary" href="{% url 'found_reports' %}" style="background: var(--soft); border-color: var(--gold); color: var(--ink);">بحث عن الشيء الذي فقدته 🔍</a>
+      </div>
+      <p class="hero-note"><span class="hero-note-icon" aria-hidden="true">✓</span><span>تحتاج إلى حساب موثّق لنشر البلاغ. البلاغات لا تظهر قبل مراجعتها.</span></p>
+    {% else %}
+      <aside class="notice">الحسابات ونشر البلاغات والتواصل متوقفة مؤقتًا حتى اختبار بريد التحقق على نطاق موثّق. التصفح والبحث في البلاغات المنشورة متاحان.</aside>
+    {% endif %}
+  </div>
+  <div class="hero-art">
+    <img src="{% static 'logo.png' %}" width="1254" height="1254" alt="شعار لقيتة">
+  </div>
+</section>
+<section class="searchbox" id="search" aria-labelledby="search-title">
+  <div class="search-heading">
+    <span class="search-symbol" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.4"></circle><path d="m15.6 15.6 4.1 4.1"></path></svg></span>
+    <div><h2 id="search-title">ابدأ بكلمة بسيطة</h2><p>ابحث عن شيء فقدته أو عثرت عليه، واستكشف البلاغات المتاحة.</p></div>
+  </div>
+  <form class="searchline" action="{% url 'search' %}" method="get">
+    <label class="sr-only" for="q">ما الذي تبحث عنه؟</label>
+    <input id="q" type="search" name="q" placeholder="ابحث عن غرض، مثل: هاتف، محفظة، مفاتيح، شيف مال...">
+    <button class="button primary">بحث عن الشيء الذي فقدته <span aria-hidden="true">←</span></button>
+  </form>
+  <div class="chips" aria-label="تصنيفات مقترحة">{% for category in categories %}<a href="{% url 'search' %}?category={{ category.slug }}">{{ category.name_ar }}</a>{% endfor %}</div>
+</section>
+<section class="section" aria-labelledby="latest-title">
+  <div class="section-head"><div><p class="eyebrow">البلاغات العامة</p><h2 id="latest-title">أحدث البلاغات المنشورة</h2></div><span class="status-pill">تُراجع البلاغات قبل النشر</span></div>
+  {% if recent %}<div class="cards">{% for report in recent %}{% include 'core/report_card.html' with report=report %}{% endfor %}</div>
+  {% else %}<div class="empty"><span class="empty-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M7 6h15l4 4v17H7z"></path><path d="M22 6v5h4M11 15h11M11 19h9"></path><circle cx="22" cy="23" r="3"></circle></svg></span><h3>لا توجد بلاغات منشورة الآن</h3><p>ستظهر البلاغات هنا بعد تفعيل الخدمة ومراجعتها.</p></div>{% endif %}
+</section>
+<section class="how" id="how" aria-labelledby="how-title">
+  <div class="how-heading"><div><p class="eyebrow">خطوات بسيطة، بوضوح وثقة</p><h2 id="how-title">كيف تعمل المنصة؟</h2></div><p class="how-intro">مسار مقترح يساعد الطرفين على التحرك بوضوح، من دون اعتبار التشابه إثباتًا للملكية.</p></div>
+  <div class="steps">
+    <article><span class="step-index">01</span><span class="step-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M8 5h12l5 5v17H8z"></path><path d="M20 5v6h5M12 16h9M12 20h9"></path></svg></span><b>أبلغ أو ابحث</b><p>ابحث بسهولة عما فقدته، أو انشر بلاغًا عن غرض عثرت عليه.</p></article>
+    <article><span class="step-index">02</span><span class="step-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M5 7h22v16H15l-7 5v-5H5z"></path><path d="M10 13h12M10 17h8"></path></svg></span><b>تواصل بأمان</b><p>ابدأ محادثة داخلية مع صاحب البلاغ دون الحاجة إلى نشر بياناتك الشخصية.</p></article>
+    <article><span class="step-index">03</span><span class="step-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="m16 4 10 4v8c0 7-4 11-10 14C10 27 6 23 6 16V8z"></path><path d="m11 16 3 3 7-8"></path></svg></span><b>تحقق قبل التسليم</b><p>تأكد من مطابقة التفاصيل قبل إعادة الغرض إلى صاحبه.</p></article>
+  </div>
+</section>
+<section class="safety" id="safety" aria-labelledby="safety-title">
+  <div class="safety-copy"><p class="eyebrow">الخصوصية والسلامة أولًا</p><h2 id="safety-title">التطابق بداية التحقق، وليس نهايته.</h2><p>إعلان يشير إلى تطابق لا يعني ملكية مؤكدة. شارك التفاصيل بحذر، وتحقق قبل التسليم.</p><a href="{% url 'safety_guide' %}">اقرأ إرشادات السلامة والتحقق <span aria-hidden="true">←</span></a></div>
+  <ul class="safety-list" id="privacy-note"><li><div><strong>احتفظ بتفاصيل التحقق</strong><span>لا تكتب كل العلامات المميزة أو محتويات الشيء في الوصف العام.</span></div></li><li><div><strong>لا تنشر معلومات حساسة</strong><span>تجنب صور الوثائق والأرقام والوجوه والبيانات التي تكشف أصحابها.</span></div></li><li><div><strong>اختر مكانًا عامًا</strong><span>لا تسلّم غرضًا حساسًا اعتمادًا على تشابه الإعلان وحده.</span></div></li></ul>
+</section>
+<section class="closing-cta" aria-label="تعريف لقيتة">
+  <span class="closing-mark"><img src="{% static 'laqeeta-mark-user.png' %}" alt=""></span>
+  <div><p class="eyebrow">لقيتة</p><h2>من الفقد إلى العثور،<br><span>ومن العثور إلى العودة.</span></h2></div>
+  <p class="closing-note">منصة المفقودات والموجودات — فكرة تُبنى على الثقة والخصوصية.</p>
+</section>
+{% endblock %}

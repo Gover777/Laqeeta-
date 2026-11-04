@@ -1,0 +1,1 @@
+{% extends 'base.html' %}{% block content %}<section class="page-heading"><h1>إعادة إرسال رابط التحقق</h1><p>ستظهر الرسالة العامة نفسها سواء أُرسل رابط أم لا.</p></section><form method="post" class="form-card">{% csrf_token %}{% include 'core/form_fields.html' with form=form %}<button class="button primary">إرسال</button></form>{% endblock %}

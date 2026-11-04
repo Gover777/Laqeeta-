@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% block title %}الملف الشخصي: {{ profile_user.display_name|default:profile_user.email }} — لقيتة{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <p class="eyebrow">الملف الشخصي للمستخدم</p>
+  <h1>{{ profile_user.display_name|default:profile_user.email }}</h1>
+  <p>عضو في منصة لقيتة منذ {{ profile_user.date_joined|date:"Y-m-d" }}.</p>
+</section>
+
+<!-- Rating Overview Card -->
+<div class="cards" style="grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.8fr); gap: 20px; margin-block: 28px;">
+  <div class="card" style="padding: 28px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; background: var(--soft);">
+    <div style="font-size: 14px; font-weight: 700; color: var(--muted); margin-bottom: 8px;">متوسط تقييم المستخدم</div>
+    {% if avg_rating %}
+      <div style="font-size: 3.5rem; font-weight: 900; line-height: 1; color: var(--green); margin-bottom: 8px;">
+        {{ avg_rating }} <span style="color: var(--gold); font-size: 2.8rem;">★</span>
+      </div>
+      <div style="color: var(--gold); font-size: 1.3rem; margin-bottom: 8px;">
+        {% if avg_rating >= 4.5 %}★★★★★
+        {% elif avg_rating >= 3.5 %}★★★★☆
+        {% elif avg_rating >= 2.5 %}★★★☆☆
+        {% elif avg_rating >= 1.5 %}★★☆☆☆
+        {% else %}★☆☆☆☆{% endif %}
+      </div>
+      <div style="font-size: 14px; color: var(--muted); font-weight: 700;">
+        بناءً على {{ ratings_cnt }} تقييم بعد استعادة وتسليم المفقودات
+      </div>
+    {% else %}
+      <div style="color: var(--muted); padding: 18px 0;">
+        <span style="font-size: 2rem; display: block; margin-bottom: 6px;">★</span>
+        لا توجد تقييمات مسجلة بعد لهذا الحساب.
+      </div>
+    {% endif %}
+
+    <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line); width: 100%; display: flex; justify-content: space-around; font-size: 13px;">
+      <div>
+        <span style="display: block; color: var(--muted);">حالة الحساب</span>
+        <strong style="color: {% if profile_user.is_verified %}var(--green){% else %}var(--muted){% endif %};">
+          {% if profile_user.is_verified %}موثّق ✓{% else %}عادي{% endif %}
+        </strong>
+      </div>
+      <div>
+        <span style="display: block; color: var(--muted);">البلاغات المنشورة</span>
+        <strong style="color: var(--green);">{{ published_reports.count }}</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ratings Details -->
+  <div class="card" style="padding: 26px;">
+    <h2 style="color: var(--green); font-size: 1.25rem; margin-top: 0; margin-bottom: 16px;">
+      سجل آراء وتقييمات المتعاملين ({{ ratings.count }})
+    </h2>
+    {% if ratings %}
+      <div style="display: flex; flex-direction: column; gap: 14px; max-height: 380px; overflow-y: auto; padding-inline-end: 4px;">
+        {% for r in ratings %}
+          <div style="padding: 14px; background: var(--soft); border-radius: 12px; border: 1px solid var(--line);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <span style="font-weight: 700; color: var(--green); font-size: 14px;">
+                {{ r.rater.display_name|default:"مستخدم موثق" }}
+              </span>
+              <span style="color: var(--gold); font-weight: 800; font-size: 14px;">
+                {{ r.score }} / 5 ★
+              </span>
+            </div>
+            {% if r.comment %}
+              <p style="margin: 6px 0; font-size: 14px; color: var(--ink);">{{ r.comment }}</p>
+            {% else %}
+              <p style="margin: 6px 0; font-size: 13px; color: var(--muted); font-style: italic;">تقييم بدون تعليق مكتوب.</p>
+            {% endif %}
+            <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-top: 6px;">
+              <span>بخصوص: {{ r.report.title }}</span>
+              <span>{{ r.created_at|date:"Y-m-d" }}</span>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="muted" style="font-size: 14px; line-height: 1.8;">
+        تُمنح التقييمات حصريًا من المستخدمين الذين تواصلوا مع هذا الحساب بعد إغلاق البلاغ بنجاح لضمان المصداقية والأمان.
+      </p>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Published Reports by this User -->
+{% if published_reports %}
+  <section class="section">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">البلاغات المتاحة</p>
+        <h2>بلاغات منشورة بواسطة {{ profile_user.display_name|default:profile_user.email }}</h2>
+      </div>
+    </div>
+    <div class="cards">
+      {% for report in published_reports %}
+        {% include 'core/report_card.html' with report=report %}
+      {% endfor %}
+    </div>
+  </section>
+{% endif %}
+
+<div class="actions" style="margin-top: 24px;">
+  <a class="button outline" href="{% url 'search' %}">← العودة للبحث</a>
+  <a class="button outline" href="{% url 'home' %}">الرئيسية</a>
+</div>
+{% endblock %}

@@ -1,0 +1,15 @@
+Tajawal font attribution
+
+Font family: Tajawal
+Included weights: Regular 400, Medium 500, Bold 700, ExtraBold 800.
+Copyright: Copyright 2018 Boutros International.
+License: SIL Open Font License, Version 1.1. The full license is in OFL.txt in this directory.
+
+Official sources:
+- Google Fonts specimen: https://fonts.google.com/specimen/Tajawal
+- Google Fonts source repository: https://github.com/googlefonts/tajawal
+- Official TTF directory: https://api.github.com/repos/googlefonts/tajawal/contents/fonts/ttf
+- Official license text: https://raw.githubusercontent.com/googlefonts/tajawal/main/OFL.txt
+- Font file source pattern: https://raw.githubusercontent.com/googlefonts/tajawal/main/fonts/ttf/Tajawal-Regular.ttf
+
+The font files are bundled locally so the website does not request the font from a third-party server when a visitor opens the site. The bundled font remains under the SIL Open Font License; see OFL.txt before redistribution or modification.

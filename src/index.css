@@ -1,0 +1,163 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'Tajarib';
+  src: url('/fonts/tajarib-light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Tajarib';
+  src: url('/fonts/tajarib-regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Tajarib';
+  src: url('/fonts/tajarib-medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Tajarib';
+  src: url('/fonts/tajarib-bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Tajarib';
+  src: url('/fonts/tajarib-black.otf') format('opentype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  font-family: 'Tajarib', system-ui, -apple-system, sans-serif;
+}
+
+body {
+  font-family: 'Tajarib', system-ui, -apple-system, sans-serif;
+  direction: rtl;
+  text-align: right;
+  background-color: #FFFFFF;
+  color: #202722;
+  margin: 0;
+  padding: 0;
+}
+
+/* Dark Mode: Ensure all green text & green icons are bright and 100% visible on dark background */
+.dark-mode h1,
+.dark-mode h2,
+.dark-mode h3,
+.dark-mode h4,
+.dark-mode h5,
+.dark-mode h6,
+.dark-mode label,
+.dark-mode strong,
+.dark-mode b,
+.dark-mode dt,
+.dark-mode p.text-\[\#173F35\],
+.dark-mode span.text-\[\#173F35\],
+.dark-mode div.text-\[\#173F35\],
+.dark-mode label.text-\[\#173F35\],
+.dark-mode strong.text-\[\#173F35\],
+.dark-mode .text-\[\#173F35\],
+.dark-mode .text-\[\#0F2D26\],
+.dark-mode .text-\[\#014B33\],
+.dark-mode .text-\[\#0d5c3a\],
+.dark-mode .text-\[\#0a462c\],
+.dark-mode .text-\[\#053b24\],
+.dark-mode .text-\[\#202722\],
+.dark-mode [class*="text-[#173F35]"],
+.dark-mode [class*="text-[#0F2D26]"],
+.dark-mode [class*="text-[#014B33]"],
+.dark-mode [class*="text-[#0d5c3a]"] {
+  color: #F0E4CC !important;
+}
+
+/* Ensure SVG icons with dark green text class also inherit the bright sand color */
+.dark-mode svg.text-\[\#173F35\],
+.dark-mode [class*="text-[#173F35]"] svg {
+  color: #F0E4CC !important;
+}
+
+/* Muted secondary text in dark mode */
+.dark-mode .text-\[\#59635D\],
+.dark-mode [class*="text-[#59635D]"] {
+  color: #C7D0C8 !important;
+}
+
+/* For elements with bright gold/sand background pills in dark mode, preserve dark text for optimal contrast */
+.dark-mode .bg-\[\#F0E4CC\] .text-\[\#173F35\],
+.dark-mode .bg-\[\#F0E4CC\].text-\[\#173F35\],
+.dark-mode .bg-\[\#B99A65\] .text-\[\#173F35\],
+.dark-mode .bg-\[\#B99A65\].text-\[\#173F35\] {
+  color: #121915 !important;
+}
+
+.dark-mode button.text-\[\#173F35\],
+.dark-mode a.text-\[\#173F35\] {
+  color: #F0E4CC !important;
+}
+
+.dark-mode .hover\:text-\[\#173F35\]:hover {
+  color: #FFFFFF !important;
+}
+
+/* Dark Mode Backgrounds & Borders Overrides for Cards, Modals & Containers */
+.dark-mode .bg-white {
+  background-color: #19231D !important;
+}
+
+.dark-mode .bg-\[\#F7F7F3\] {
+  background-color: #1D2821 !important;
+}
+
+.dark-mode .border-\[\#E3E7E0\],
+.dark-mode .border-\[\#C7D0C8\] {
+  border-color: #34463A !important;
+}
+
+/* Ensure step indicator text and numbers in 'How it works' and modals stand out in dark mode */
+.dark-mode .text-\[\#F0E4CC\] {
+  color: #F0E4CC !important;
+}
+
+.dark-mode .text-\[\#B99A65\] {
+  color: #D7B45D !important;
+}
+
+/* Ensure SVGs and icons inside light sand/gold background circles or badges stay dark and 100% visible in dark mode */
+.dark-mode .bg-\[\#F0E4CC\] svg,
+.dark-mode .bg-\[\#F0E4CC\] *,
+.dark-mode .bg-\[\#B99A65\] svg,
+.dark-mode .bg-\[\#B99A65\] * {
+  color: #121915 !important;
+  stroke: #121915 !important;
+}
+
+.dark-mode input,
+.dark-mode select,
+.dark-mode textarea {
+  color: #FFFFFF !important;
+  background-color: #141D17 !important;
+  border-color: #627268 !important;
+}
+
+.dark-mode select option {
+  color: #FFFFFF !important;
+  background-color: #19231D !important;
+}
+
+
+
+

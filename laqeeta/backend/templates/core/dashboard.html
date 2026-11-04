@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% block title %}لوحة التحكم — لقيتة{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <p class="eyebrow">مساحة المستخدم الخاصة</p>
+  <h1>أهلاً بك، {{ request.user.display_name|default:request.user.email }}</h1>
+  <p>إدارة بلاغاتك ومحادثاتك بأمان تام وخصوصية مطلقة.</p>
+  <div class="actions" style="margin-top: 16px;">
+    <a class="button primary" href="{% url 'report_create' %}">إنشاء بلاغ جديد +</a>
+    <a class="button outline" href="{% url 'inbox_list' %}">صندوق الرسائل</a>
+    <a class="button outline" href="{% url 'account_settings' %}">إعدادات الحساب</a>
+  </div>
+</section>
+
+<!-- Stats overview -->
+<div class="cards" style="grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-block: 24px;">
+  <div class="card" style="text-align: center; padding: 18px 14px;">
+    <small class="muted">إجمالي بلاغاتي</small>
+    <div style="color: var(--green); font-size: 2rem; font-weight: 800; margin-top: 4px;">{{ reports.count }}</div>
+  </div>
+  <div class="card" style="text-align: center; padding: 18px 14px;">
+    <small class="muted">قيد المراجعة</small>
+    <div style="color: var(--gold); font-size: 2rem; font-weight: 800; margin-top: 4px;">
+      {% with c=0 %}
+        {% for r in reports %}{% if r.status == 'pending' %}{% with c=c|add:1 %}{% endwith %}{% endif %}{% endfor %}
+      {% endwith %}
+      {{ pending_count|default:"-" }}
+    </div>
+  </div>
+  <div class="card" style="text-align: center; padding: 18px 14px;">
+    <small class="muted">البلاغات المنشورة</small>
+    <div style="color: var(--green); font-size: 2rem; font-weight: 800; margin-top: 4px;">
+      {{ published_count|default:"-" }}
+    </div>
+  </div>
+  <div class="card" style="text-align: center; padding: 18px 14px;">
+    <small class="muted">المغلقة أو المنتهية</small>
+    <div style="color: var(--muted); font-size: 2rem; font-weight: 800; margin-top: 4px;">
+      {{ closed_count|default:"-" }}
+    </div>
+  </div>
+</div>
+
+<section class="section">
+  <div class="section-head">
+    <div>
+      <p class="eyebrow">إدارة المحتوى</p>
+      <h2>قائمة بلاغاتي</h2>
+    </div>
+  </div>
+  {% if reports %}
+    <div class="table-wrap" style="overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 10px;">
+      <table style="width: 100%; border-collapse: collapse; text-align: start;">
+        <thead>
+          <tr style="border-bottom: 2px solid var(--line); color: var(--green);">
+            <th style="padding: 12px 14px;">الغرض</th>
+            <th style="padding: 12px 14px;">النوع</th>
+            <th style="padding: 12px 14px;">الحالة</th>
+            <th style="padding: 12px 14px;">الموقع</th>
+            <th style="padding: 12px 14px;">التاريخ</th>
+            <th style="padding: 12px 14px;">الإجراءات</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for report in reports %}
+            <tr style="border-bottom: 1px solid var(--line);">
+              <td style="padding: 14px; font-weight: 700;">
+                {% if report.status == 'published' %}
+                  <a href="{% url 'report_detail' report.pk %}">{{ report.title }}</a>
+                {% else %}
+                  {{ report.title }}
+                {% endif %}
+              </td>
+              <td style="padding: 14px;">
+                <span class="status-pill" style="font-size: 11px;">{{ report.get_kind_display }}</span>
+              </td>
+              <td style="padding: 14px;">
+                <span style="font-weight: 700; color: {% if report.status == 'published' %}var(--green){% elif report.status == 'pending' %}var(--gold){% elif report.status == 'closed' %}var(--muted){% else %}var(--danger){% endif %};">
+                  {{ report.get_status_display }}
+                </span>
+              </td>
+              <td style="padding: 14px;">{{ report.governorate }}، {{ report.city }}</td>
+              <td style="padding: 14px; font-size: 13px;">{{ report.event_date|date:"Y-m-d" }}</td>
+              <td style="padding: 14px;">
+                <div style="display: flex; gap: 8px; align-items: center;">
+                  {% if report.status != 'closed' and report.status != 'rejected' %}
+                    <a class="button outline small" style="min-height: 32px; padding: 4px 10px; font-size: 12px;" href="{% url 'report_edit' report.pk %}">تعديل</a>
+                    <form method="post" action="{% url 'report_close' report.pk %}" style="display: inline;">
+                      {% csrf_token %}
+                      <button class="button danger small" style="min-height: 32px; padding: 4px 10px; font-size: 12px;" type="submit" onclick="return confirm('هل أنت متأكد من إغلاق هذا البلاغ؟ لن يظهر في نتائج البحث.');">إغلاق</button>
+                    </form>
+                  {% endif %}
+                  {% if report.status == 'published' %}
+                    <a class="link-button" href="{% url 'report_detail' report.pk %}">عرض</a>
+                  {% elif report.status == 'closed' %}
+                    <a class="button outline small" style="min-height: 32px; padding: 4px 10px; font-size: 12px; color: var(--green); border-color: var(--green);" href="{% url 'report_detail' report.pk %}">عرض وتقييم ★</a>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="empty">
+      <span class="empty-icon" aria-hidden="true">
+        <svg viewBox="0 0 32 32"><path d="M7 6h15l4 4v17H7z" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+      </span>
+      <h3>لم تنشئ أي بلاغات بعد</h3>
+      <p>يمكنك الآن الإبلاغ عن غرض مفقود تبحث عنه أو شيء عثرت عليه لمساعدة صاحبه.</p>
+      <div style="margin-top: 14px;">
+        <a class="button primary" href="{% url 'report_create' %}">إنشاء بلاغ الآن</a>
+      </div>
+    </div>
+  {% endif %}
+</section>
+
+<section class="section" style="margin-top: 24px;">
+  <div class="section-head">
+    <div>
+      <p class="eyebrow">المحادثات</p>
+      <h2>المحادثات النشطة</h2>
+    </div>
+    {% if conversations %}
+      <a class="button outline small" href="{% url 'inbox_list' %}">عرض كل الرسائل</a>
+    {% endif %}
+  </div>
+  {% if conversations %}
+    <div class="cards" style="grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px;">
+      {% for thread in conversations %}
+        <article class="card">
+          <span class="eyebrow">بلاغ: {{ thread.report.title }}</span>
+          <h3 style="margin: 4px 0 8px;">
+            <a href="{% url 'conversation' thread.pk %}">
+              مع: {% if request.user == thread.claimant %}{{ thread.owner.display_name|default:thread.owner.email }}{% else %}{{ thread.claimant.display_name|default:thread.claimant.email }}{% endif %}
+            </a>
+          </h3>
+          <p class="muted" style="font-size: 13px;">تواصل خاص وآمن داخل منصة لقيتة.</p>
+          <div style="margin-top: 10px;">
+            <a class="button primary small" href="{% url 'conversation' thread.pk %}">متابعة المحادثة ←</a>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="muted">لا توجد محادثات نشطة بعد.</p>
+  {% endif %}
+</section>
+{% endblock %}
