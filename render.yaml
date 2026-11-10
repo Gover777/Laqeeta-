@@ -1,0 +1,16 @@
+# Render Blueprint Configuration for Laqeeta Django Backend
+services:
+  - type: web
+    name: laqeeta-backend
+    runtime: python
+    buildCommand: pip install -r laqeeta/backend/requirements.txt
+    startCommand: python run_server.py
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DJANGO_ALLOWED_HOSTS
+        sync: false
+      - key: DEBUG
+        value: "false"
