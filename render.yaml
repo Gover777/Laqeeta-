@@ -1,16 +1,33 @@
-# Render Blueprint Configuration for Laqeeta Django Backend
+# Render Blueprint Configuration for Laqeeta Django Backend (Production Hardened)
 services:
   - type: web
     name: laqeeta-backend
     runtime: python
-    buildCommand: pip install -r laqeeta/backend/requirements.txt
-    startCommand: python run_server.py
+    buildCommand: pip install -r laqeeta/backend/requirements.txt && python laqeeta/backend/manage.py collectstatic --noinput
+    startCommand: python laqeeta/backend/manage.py migrate --noinput && gunicorn config.wsgi:application --chdir laqeeta/backend --bind 0.0.0.0:$PORT --workers 2 --timeout 60
+    healthCheckPath: /healthz/
     envVars:
       - key: DATABASE_URL
         sync: false
-      - key: SECRET_KEY
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: EDGE_PROXY_SECRET
         generateValue: true
       - key: DJANGO_ALLOWED_HOSTS
         sync: false
-      - key: DEBUG
+      - key: DJANGO_CSRF_TRUSTED_ORIGINS
+        sync: false
+      - key: SITE_URL
+        sync: false
+      - key: PUBLIC_BASE_URL
+        sync: false
+      - key: DJANGO_DEBUG
+        value: "false"
+      - key: REQUIRE_EDGE_PROXY
+        value: "true"
+      - key: SECURE_SSL_REDIRECT
+        value: "true"
+      - key: SECURE_HSTS_SECONDS
+        value: "31536000"
+      - key: PHOTO_UPLOADS_ENABLED
         value: "false"

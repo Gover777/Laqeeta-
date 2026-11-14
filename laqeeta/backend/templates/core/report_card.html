@@ -4,7 +4,7 @@
   <p>{{ report.public_description|truncatechars:150 }}</p>
   <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px; font-size: 13px; border-top: 1px solid var(--line); padding-top: 8px;">
     <a href="{% url 'user_profile' report.owner.pk %}" style="font-weight: 800; color: var(--green); text-decoration: none;">
-      👤 {{ report.owner.display_name|default:report.owner.email }}
+      👤 {{ report.owner.display_name|default:"عضو لقيتة" }}
       <span style="color: var(--gold); font-size: 11px;">(تقييم ★)</span>
     </a>
     <span class="muted" style="font-size: 11px;">{{ report.governorate }}، {{ report.city }}</span>

@@ -7,7 +7,7 @@
   <div style="display: flex; align-items: center; gap: 12px; margin-top: 6px; flex-wrap: wrap;">
     <span class="muted">الطرف الآخر:</span>
     <a href="{% url 'user_profile' other_user.pk %}" style="font-weight: 800;">
-      {{ other_user.display_name|default:other_user.email }}
+      {{ other_user.display_name|default:"عضو لقيتة" }}
     </a>
     {% if other_user.average_rating %}
       <span style="color: var(--gold); font-weight: 800; font-size: 14px;">
@@ -27,7 +27,7 @@
       </div>
       {% if can_rate %}
         <a class="button primary small" href="{% url 'submit_rating' thread.report.pk other_user.pk %}">
-          تقييم {{ other_user.display_name|default:other_user.email }} ★
+          تقييم {{ other_user.display_name|default:"عضو لقيتة" }} ★
         </a>
       {% elif existing_rating %}
         <span style="font-weight: 700; color: var(--gold); font-size: 14px;">

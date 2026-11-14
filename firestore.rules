@@ -1,42 +1,120 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Default deny catch-all
+    // Global Safety Net: Default deny catch-all
     match /{document=**} {
       allow read, write: if false;
     }
 
-    // Helpers
+    // Hardened Global Primitives
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
     function isSignedIn() {
       return request.auth != null;
+    }
+
+    function isVerifiedEmail() {
+      return isSignedIn() && request.auth.token.email_verified == true;
     }
 
     function isOwner(userId) {
       return isSignedIn() && request.auth.uid == userId;
     }
 
-    // Users Collection
+    // Validation Blueprint: UserProfile
+    function isValidUser(data, userId) {
+      return data.keys().hasAll(['id', 'name', 'email', 'isVerified', 'dateJoined'])
+        && data.keys().hasOnly(['id', 'name', 'email', 'isVerified', 'dateJoined'])
+        && data.id is string && data.id == userId && data.id.size() <= 128
+        && data.name is string && data.name.size() >= 1 && data.name.size() <= 100
+        && data.email is string && data.email.size() <= 150
+        && data.isVerified is bool
+        && data.dateJoined is string && data.dateJoined.size() >= 8 && data.dateJoined.size() <= 32;
+    }
+
+    // Validation Blueprint: ReportItem (Strict schema, no PII fields allowed)
+    function isValidReport(data) {
+      return data.keys().hasAll([
+          'title', 'kind', 'category', 'governorate', 'city',
+          'eventDate', 'status', 'publicDescription', 'ownerId', 'ownerName', 'createdAt'
+        ])
+        && data.keys().hasOnly([
+          'title', 'kind', 'category', 'governorate', 'city',
+          'eventDate', 'status', 'publicDescription', 'ownerId', 'ownerName', 'createdAt', 'closedAt'
+        ])
+        && data.title is string && data.title.size() >= 3 && data.title.size() <= 150
+        && data.kind is string && data.kind in ['lost', 'found']
+        && data.category is string && data.category.size() >= 2 && data.category.size() <= 100
+        && data.governorate is string && data.governorate.size() >= 2 && data.governorate.size() <= 100
+        && data.city is string && data.city.size() >= 2 && data.city.size() <= 150
+        && data.eventDate is string && data.eventDate.size() >= 8 && data.eventDate.size() <= 32
+        && data.status is string && data.status in ['published', 'closed', 'pending']
+        && data.publicDescription is string && data.publicDescription.size() >= 10 && data.publicDescription.size() <= 2000
+        && data.ownerId is string && isValidId(data.ownerId)
+        && data.ownerName is string && data.ownerName.size() >= 1 && data.ownerName.size() <= 100
+        && data.createdAt is string && data.createdAt.size() >= 8 && data.createdAt.size() <= 40
+        && (!('closedAt' in data) || (data.closedAt is string && data.closedAt.size() <= 32));
+    }
+
+    // Users Collection (PII isolated strictly to owner; listing prohibited)
     match /users/{userId} {
-      allow read: if true;
-      allow create, update: if isOwner(userId);
+      allow get: if isValidId(userId) && isOwner(userId);
+      allow list: if false;
+      allow create: if isValidId(userId)
+        && isOwner(userId)
+        && isValidUser(incoming(), userId)
+        && incoming().isVerified == (request.auth.token.email_verified == true);
+      allow update: if isValidId(userId)
+        && isOwner(userId)
+        && isValidUser(incoming(), userId)
+        && incoming().id == existing().id
+        && incoming().dateJoined == existing().dateJoined
+        && incoming().email == existing().email
+        && incoming().isVerified == (request.auth.token.email_verified == true)
+        && incoming().diff(existing()).affectedKeys().hasOnly(['name', 'isVerified']);
       allow delete: if false;
     }
 
-    // Reports Collection
+    // Reports Collection (Publicly readable only when published/closed; strictly validated owner writes)
     match /reports/{reportId} {
-      allow read: if true;
-      allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
-      allow update, delete: if isSignedIn() && (
-        resource.data.ownerId == request.auth.uid ||
-        resource.data.involvedClaimantId == request.auth.uid
-      );
+      allow get: if isValidId(reportId)
+        && (resource == null || existing().status in ['published', 'closed'] || (isSignedIn() && existing().ownerId == request.auth.uid));
+      allow list: if resource.data.status in ['published', 'closed']
+        || (isSignedIn() && resource.data.ownerId == request.auth.uid);
+      allow create: if isValidId(reportId)
+        && isVerifiedEmail()
+        && isValidReport(incoming())
+        && incoming().ownerId == request.auth.uid
+        && incoming().status in ['pending', 'published'];
+      allow update: if isValidId(reportId)
+        && isVerifiedEmail()
+        && existing().ownerId == request.auth.uid
+        && existing().status != 'closed'
+        && isValidReport(incoming())
+        && incoming().ownerId == existing().ownerId
+        && incoming().createdAt == existing().createdAt
+        && incoming().kind == existing().kind
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'title', 'publicDescription', 'category', 'governorate', 'city', 'status', 'closedAt'
+        ]);
+      allow delete: if isValidId(reportId)
+        && isVerifiedEmail()
+        && existing().ownerId == request.auth.uid;
     }
 
-    // Reviews Collection
+    // Deprecated Reviews Collection (Rating system removed)
     match /reviews/{reviewId} {
-      allow read: if true;
-      allow create: if isSignedIn() && request.resource.data.raterUserId == request.auth.uid;
-      allow update, delete: if false;
+      allow read, write: if false;
     }
   }
 }

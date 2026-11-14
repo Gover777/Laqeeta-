@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
-{% block title %}الملف الشخصي: {{ profile_user.display_name|default:profile_user.email }} — لقيتة{% endblock %}
+{% block title %}الملف الشخصي: {{ profile_user.display_name|default:"عضو لقيتة" }} — لقيتة{% endblock %}
 {% block content %}
 <section class="page-heading">
   <p class="eyebrow">الملف الشخصي للمستخدم</p>
-  <h1>{{ profile_user.display_name|default:profile_user.email }}</h1>
+  <h1>{{ profile_user.display_name|default:"عضو لقيتة" }}</h1>
   <p>عضو في منصة لقيتة منذ {{ profile_user.date_joined|date:"Y-m-d" }}.</p>
 </section>
 
@@ -89,7 +89,7 @@
     <div class="section-head">
       <div>
         <p class="eyebrow">البلاغات المتاحة</p>
-        <h2>بلاغات منشورة بواسطة {{ profile_user.display_name|default:profile_user.email }}</h2>
+        <h2>بلاغات منشورة بواسطة {{ profile_user.display_name|default:"عضو لقيتة" }}</h2>
       </div>
     </div>
     <div class="cards">

@@ -2,70 +2,46 @@
   "entities": {
     "UserProfile": {
       "title": "UserProfile",
-      "description": "User account profile document in Firestore",
+      "description": "Private user account profile document in Firestore",
       "type": "object",
       "properties": {
-        "id": { "type": "string", "description": "Firebase Auth UID" },
-        "name": { "type": "string", "description": "Full name of the user", "maxLength": 100 },
+        "id": { "type": "string", "description": "Firebase Auth UID", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "name": { "type": "string", "description": "Display name of the user", "minLength": 1, "maxLength": 100 },
         "email": { "type": "string", "description": "Email address", "maxLength": 150 },
-        "isVerified": { "type": "boolean", "description": "Whether the user account is verified" },
-        "dateJoined": { "type": "string", "description": "ISO date string of account creation" },
-        "ratingsCount": { "type": "number", "description": "Total number of completed ratings received" },
-        "averageRating": { "type": "number", "description": "Average rating score from 0 to 5" }
+        "isVerified": { "type": "boolean", "description": "Whether the user email is verified" },
+        "dateJoined": { "type": "string", "description": "ISO date string of account creation", "maxLength": 32 }
       },
       "required": ["id", "name", "email", "isVerified", "dateJoined"]
     },
     "ReportItem": {
       "title": "ReportItem",
-      "description": "Lost or found report submitted by a user",
+      "description": "Lost or found report submitted by a verified user (no PII stored)",
       "type": "object",
       "properties": {
-        "id": { "type": "string", "description": "Unique report ID" },
-        "title": { "type": "string", "description": "Report title", "maxLength": 150 },
+        "title": { "type": "string", "description": "Report title", "minLength": 3, "maxLength": 150 },
         "kind": { "type": "string", "enum": ["lost", "found"], "description": "Whether the item is lost or found" },
-        "category": { "type": "string", "description": "Item category", "maxLength": 100 },
-        "governorate": { "type": "string", "description": "Governorate in Yemen", "maxLength": 100 },
-        "city": { "type": "string", "description": "City or district", "maxLength": 150 },
-        "eventDate": { "type": "string", "description": "Date lost or found" },
+        "category": { "type": "string", "description": "Item category", "minLength": 2, "maxLength": 100 },
+        "governorate": { "type": "string", "description": "Governorate", "minLength": 2, "maxLength": 100 },
+        "city": { "type": "string", "description": "City or district", "minLength": 2, "maxLength": 150 },
+        "eventDate": { "type": "string", "description": "Date lost or found", "maxLength": 32 },
         "status": { "type": "string", "enum": ["published", "closed", "pending"], "description": "Report lifecycle status" },
-        "publicDescription": { "type": "string", "description": "Public description of item", "maxLength": 2000 },
-        "ownerId": { "type": "string", "description": "Firebase Auth UID of the report owner" },
-        "ownerName": { "type": "string", "description": "Name of the report owner", "maxLength": 100 },
-        "ownerEmail": { "type": "string", "description": "Email of report owner", "maxLength": 150 },
-        "involvedClaimantId": { "type": "string", "description": "Optional claimant UID" },
-        "createdAt": { "type": "string", "description": "Creation timestamp" }
+        "publicDescription": { "type": "string", "description": "Public description of item", "minLength": 10, "maxLength": 2000 },
+        "ownerId": { "type": "string", "description": "Firebase Auth UID of the report owner", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "ownerName": { "type": "string", "description": "Public display name of the report owner", "minLength": 1, "maxLength": 100 },
+        "closedAt": { "type": "string", "description": "Closure date", "maxLength": 32 },
+        "createdAt": { "type": "string", "description": "Creation ISO timestamp", "maxLength": 40 }
       },
-      "required": ["id", "title", "kind", "category", "governorate", "city", "eventDate", "status", "publicDescription", "ownerId", "ownerName"]
-    },
-    "ReviewItem": {
-      "title": "ReviewItem",
-      "description": "Review/Rating left by a user for another user after report closure",
-      "type": "object",
-      "properties": {
-        "id": { "type": "string", "description": "Unique review ID" },
-        "targetUserId": { "type": "string", "description": "UID of the user being rated" },
-        "raterUserId": { "type": "string", "description": "UID of the user leaving the rating" },
-        "raterName": { "type": "string", "description": "Name of the rater", "maxLength": 100 },
-        "reportTitle": { "type": "string", "description": "Title of report related to this review", "maxLength": 150 },
-        "score": { "type": "number", "description": "Rating score between 1 and 5" },
-        "comment": { "type": "string", "description": "Review comment", "maxLength": 1000 },
-        "date": { "type": "string", "description": "Date review was submitted" }
-      },
-      "required": ["id", "targetUserId", "raterUserId", "raterName", "reportTitle", "score", "comment", "date"]
+      "required": ["title", "kind", "category", "governorate", "city", "eventDate", "status", "publicDescription", "ownerId", "ownerName", "createdAt"]
     }
   },
   "firestore": {
     "/users/{userId}": {
       "schema": { "$ref": "#/entities/UserProfile" },
-      "description": "Public user profiles"
+      "description": "Private user profile documents (owner-only read/write)"
     },
     "/reports/{reportId}": {
       "schema": { "$ref": "#/entities/ReportItem" },
-      "description": "Lost and found reports"
-    },
-    "/reviews/{reviewId}": {
-      "schema": { "$ref": "#/entities/ReviewItem" },
-      "description": "Ratings and reviews submitted for users"
+      "description": "Public lost and found reports without PII"
     }
   }
 }

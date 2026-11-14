@@ -14,7 +14,7 @@
         <div>
           <span class="eyebrow" style="margin-bottom: 4px;">بلاغ: {{ conv.report.title }}</span>
           <h2 style="margin: 0; color: var(--green); font-size: 1.2rem;">
-            محادثة مع: {% if request.user == conv.claimant %}{{ conv.owner.display_name|default:conv.owner.email }}{% else %}{{ conv.claimant.display_name|default:conv.claimant.email }}{% endif %}
+            محادثة مع: {% if request.user == conv.claimant %}{{ conv.owner.display_name|default:"عضو لقيتة" }}{% else %}{{ conv.claimant.display_name|default:"عضو لقيتة" }}{% endif %}
           </h2>
           <small class="muted">آخر تحديث: {{ conv.updated_at|date:"Y-m-d H:i" }}</small>
         </div>

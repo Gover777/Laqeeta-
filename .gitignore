@@ -4,5 +4,12 @@ dist/
 coverage/
 .DS_Store
 *.log
+*.bak
+*.sql
+*.sqlite3
 .env*
 !.env.example
+laqeeta/backend/db.sqlite3
+laqeeta/backend/private_media/
+laqeeta/backend/staticfiles/
+.gmp_cache/

@@ -3,26 +3,15 @@ import {
   getAuth,
   GoogleAuthProvider,
   signInWithPopup,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
+  sendEmailVerification,
   User
 } from 'firebase/auth';
 import {
   getFirestore,
   doc,
-  getDoc,
-  getDocFromServer,
-  setDoc,
-  updateDoc,
-  collection,
-  getDocs,
-  addDoc,
-  query,
-  where,
-  orderBy,
-  onSnapshot
+  getDocFromServer
 } from 'firebase/firestore';
 import firebaseConfig from '../firebase-applet-config.json';
 
@@ -34,6 +23,7 @@ export const auth = getAuth(app);
 export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
 
 export const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({ prompt: 'select_account' });
 
 export enum OperationType {
   CREATE = 'create',
@@ -72,10 +62,10 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
   throw new Error(JSON.stringify(errInfo));
 }
 
-// Test connectivity on initial boot as required by Firebase skill
+// Test connectivity on initial boot against public collection rule
 export async function testFirestoreConnection() {
   try {
-    await getDocFromServer(doc(db, 'users', 'connection_test'));
+    await getDocFromServer(doc(db, 'reports', 'connection_test'));
   } catch (error) {
     if (error instanceof Error && error.message.includes('the client is offline')) {
       console.warn("Firebase client is currently offline or connecting...");
@@ -103,5 +93,5 @@ export const logoutUser = async () => {
   }
 };
 
-export { onAuthStateChanged };
+export { onAuthStateChanged, sendEmailVerification };
 export type { User };

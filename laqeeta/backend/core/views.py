@@ -132,11 +132,14 @@ def resend_verification(request):
     return render(request, "registration/resend_verification.html", {"form":form})
 
 def verify_email(request, uidb64, token):
+    if increment_rate_limit(request, "verify_email", 900) > 20:
+        return HttpResponse("تم تجاوز حد الطلبات مؤقتًا. حاول لاحقًا.", status=429, content_type="text/plain; charset=utf-8")
     try:
         uid = force_str(urlsafe_base64_decode(uidb64)); user = User.objects.get(pk=uid)
     except (ValueError, TypeError, OverflowError, User.DoesNotExist): user = None
     if user and verification_token.check_token(user, token):
         user.is_verified = True; user.save(update_fields=["is_verified"])
+        AuditEvent.objects.create(actor=user, action="email_verified", object_type="User", object_id=str(user.pk), reason="تفعيل البريد الإلكتروني")
         messages.success(request, "تم التحقق من بريدك. يمكنك تسجيل الدخول الآن.")
         return redirect("login")
     return render(request, "registration/verification_invalid.html", status=400)
@@ -318,6 +321,7 @@ def block_user(request, pk):
     form = BlockForm(request.POST)
     if form.is_valid():
         UserBlock.objects.get_or_create(blocker=request.user, blocked_id=target_id)
+        AuditEvent.objects.create(actor=request.user, action="user_block", object_type="User", object_id=str(target_id), reason="حظر مستخدم عبر المحادثة")
         messages.success(request,"تم حظر المستخدم وإيقاف الرسائل المتبادلة.")
     return redirect("dashboard")
 
@@ -360,6 +364,24 @@ def password_reset(request):
 class SafePasswordResetConfirmView(PasswordResetConfirmView):
     template_name = "registration/password_reset_confirm.html"
     success_url = "/accounts/password/reset/complete/"
+
+    def dispatch(self, request, *args, **kwargs):
+        limited_resp = rate_limit(request, "password_reset_confirm", 10, 900)
+        if limited_resp is not None:
+            return limited_resp
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        if getattr(self, "user", None):
+            AuditEvent.objects.create(
+                actor=self.user,
+                action="password_reset_complete",
+                object_type="User",
+                object_id=str(self.user.pk),
+                reason="إعادة تعيين كلمة المرور",
+            )
+        return response
 
 
 def lost_reports(request):
@@ -486,7 +508,7 @@ def submit_rating(request, report_pk, user_pk):
             object_id=str(rating.pk),
             reason=f"تقييم {rating.score} نجوم للبلاغ {report.title}"
         )
-        messages.success(request, f"شكرًا لك! تم تسجيل تقييمك ({rating.score} نجوم) للمستخدم {rated_user.display_name or rated_user.email} بنجاح.")
+        messages.success(request, f"شكرًا لك! تم تسجيل تقييمك ({rating.score} نجوم) للمستخدم {rated_user.display_name or 'عضو لقيتة'} بنجاح.")
         return redirect("user_profile", pk=rated_user.pk)
 
     return render(request, "core/rating_form.html", {

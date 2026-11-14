@@ -4,3 +4,4 @@ psycopg[binary]==3.3.6
 gunicorn==26.2.0
 Pillow==13.0.0
 whitenoise==6.12.0
+argon2-cffi==23.1.0

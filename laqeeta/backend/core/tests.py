@@ -68,7 +68,7 @@ class LaqeetaTestCase(TestCase):
 @override_settings(PUBLIC_AUTH_ENABLED=True)
 class AccountFlowTests(TestCase):
     def test_signup_verification_and_login(self):
-        r = self.client.post(reverse("signup"), {"display_name": "مستخدم جديد", "email": "New@Example.test", "password1": PASSWORD, "password2": PASSWORD})
+        r = self.client.post(reverse("signup"), {"display_name": "مستخدم جديد", "email": "New@Example.test", "password1": PASSWORD, "password2": PASSWORD, "agree_terms": "on"})
         self.assertRedirects(r, reverse("verification_sent"))
         u = User.objects.get(email="new@example.test")
         self.assertFalse(u.is_verified)
@@ -424,3 +424,52 @@ class ConcurrentRateLimitTests(TransactionTestCase):
             connections.close_all()
         self.assertEqual(sorted(counts), list(range(1, workers + 1)))
         self.assertEqual(RateLimitCounter.objects.get().count, workers)
+
+
+class SecurityHardeningRegressionTests(LaqeetaTestCase):
+    def test_signup_requires_agree_terms(self):
+        with override_settings(PUBLIC_AUTH_ENABLED=True):
+            r = self.client.post(reverse("signup"), {"display_name": "مستخدم", "email": "terms@example.test", "password1": PASSWORD, "password2": PASSWORD})
+            self.assertEqual(r.status_code, 200)
+            self.assertFalse(User.objects.filter(email="terms@example.test").exists())
+
+    def test_security_headers_and_password_reset_timeout(self):
+        from django.conf import settings
+        self.assertLessEqual(settings.PASSWORD_RESET_TIMEOUT, 1800)
+        resp = self.client.get(reverse("home"))
+        self.assertIn("script-src 'none'", resp.headers.get("Content-Security-Policy", ""))
+        self.assertIn("frame-ancestors 'none'", resp.headers.get("Content-Security-Policy", ""))
+        self.assertIn("Permissions-Policy", resp.headers)
+        self.assertEqual(resp.headers.get("Cross-Origin-Opener-Policy"), "same-origin")
+        self.login_as(self.owner)
+        dash = self.client.get(reverse("dashboard"))
+        self.assertIn("no-store", dash.headers.get("Cache-Control", ""))
+
+    def test_public_pages_never_leak_owner_email_when_display_name_blank(self):
+        no_name_user = User.objects.create_user(username="secret-email@example.test", email="secret-email@example.test", password=PASSWORD, is_verified=True, display_name="")
+        rep = Report.objects.create(
+            owner=no_name_user,
+            kind="lost",
+            title="حقيبة سفر",
+            public_description="حقيبة سفر سوداء فقدت في المطار.",
+            category=self.cat,
+            governorate="عدن",
+            city="خورمكسر",
+            event_date=timezone.localdate(),
+            status="published",
+            published_at=timezone.now(),
+        )
+        detail = self.client.get(reverse("report_detail", kwargs={"pk": rep.pk}))
+        self.assertNotContains(detail, "secret-email@example.test")
+        profile = self.client.get(reverse("user_profile", kwargs={"pk": no_name_user.pk}))
+        self.assertNotContains(profile, "secret-email@example.test")
+        search_resp = self.client.get(reverse("search"), {"q": "حقيبة"})
+        self.assertNotContains(search_resp, "secret-email@example.test")
+
+    def test_admin_login_is_rate_limited(self):
+        RateLimitCounter.objects.all().delete()
+        client = Client()
+        for _ in range(5):
+            r = client.post("/admin/login/", {"username": "x@example.test", "password": "wrong"})
+            self.assertIn(r.status_code, {200, 302})
+        self.assertEqual(client.post("/admin/login/", {"username": "x@example.test", "password": "wrong"}).status_code, 429)

@@ -5,11 +5,21 @@ from django.utils import timezone
 from .models import User, Report, Category, ReportPrivateDetails, AbuseReport, UserRating
 
 class SignupForm(forms.Form):
-    display_name = forms.CharField(max_length=80, label="الاسم المعروض")
+    display_name = forms.CharField(max_length=80, min_length=2, label="الاسم المعروض")
     email = forms.EmailField(max_length=254, label="البريد الإلكتروني")
     password1 = forms.CharField(widget=forms.PasswordInput, label="كلمة المرور")
     password2 = forms.CharField(widget=forms.PasswordInput, label="تأكيد كلمة المرور")
-    agree_terms = forms.BooleanField(required=False, initial=True, label="أوافق على شروط الاستخدام وسياسة الخصوصية")
+    agree_terms = forms.BooleanField(
+        required=True,
+        initial=True,
+        label="أوافق على شروط الاستخدام وسياسة الخصوصية",
+        error_messages={"required": "يجب الموافقة على شروط الاستخدام وسياسة الخصوصية."},
+    )
+    def clean_display_name(self):
+        value = self.cleaned_data["display_name"].strip()
+        if len(value) < 2:
+            raise forms.ValidationError("يجب أن يتكون الاسم المعروض من حرفين على الأقل.")
+        return value
     def clean_email(self):
         email = self.cleaned_data["email"].strip().lower()
         if User.objects.filter(email__iexact=email).exists(): raise forms.ValidationError("تعذر إنشاء الحساب بهذه البيانات. تحقق من البريد أو سجّل الدخول.")
@@ -31,6 +41,11 @@ class AccountSettingsForm(forms.ModelForm):
         model = User
         fields = ["display_name"]
         labels = {"display_name": "الاسم المعروض"}
+    def clean_display_name(self):
+        value = (self.cleaned_data.get("display_name") or "").strip()
+        if len(value) < 2:
+            raise forms.ValidationError("يجب أن يتكون الاسم المعروض من حرفين على الأقل.")
+        return value
 
 class EmailLoginForm(AuthenticationForm):
     username = forms.EmailField(label="البريد الإلكتروني", widget=forms.EmailInput(attrs={"autocomplete":"email"}))

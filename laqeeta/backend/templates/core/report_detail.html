@@ -19,7 +19,7 @@
     <div>
       <span class="muted" style="font-size: 13px;">صاحب البلاغ:</span>
       <a href="{% url 'user_profile' report.owner.pk %}" style="font-weight: 800; margin-inline: 4px;">
-        {{ report.owner.display_name|default:report.owner.email }}
+        {{ report.owner.display_name|default:"عضو لقيتة" }}
       </a>
       {% if report.owner.average_rating %}
         <span style="color: var(--gold); font-weight: 800; font-size: 13px;">
@@ -68,7 +68,7 @@
           <div style="display: flex; gap: 10px; flex-wrap: wrap;">
             {% for u in ratable_users %}
               <a class="button primary small" href="{% url 'submit_rating' report.pk u.pk %}">
-                تقييم {{ u.display_name|default:u.email }} (1-5 نجوم) ★
+                تقييم {{ u.display_name|default:"عضو لقيتة" }} (1-5 نجوم) ★
               </a>
             {% endfor %}
           </div>
@@ -85,7 +85,7 @@
           <div style="display: flex; flex-direction: column; gap: 8px;">
             {% for r in all_ratings %}
               <div style="font-size: 13px; background: var(--surface); padding: 8px 12px; border-radius: 8px;">
-                <b>{{ r.rater.display_name|default:r.rater.email }}</b> قيّم <b>{{ r.rated_user.display_name|default:r.rated_user.email }}</b>:
+                <b>{{ r.rater.display_name|default:"عضو لقيتة" }}</b> قيّم <b>{{ r.rated_user.display_name|default:"عضو لقيتة" }}</b>:
                 <span style="color: var(--gold); font-weight: 800;">{{ r.score }} / 5 ★</span>
                 {% if r.comment %}<span style="color: var(--muted); margin-inline-start: 8px;">"{{ r.comment }}"</span>{% endif %}
               </div>
@@ -117,10 +117,9 @@
         {% if request.user.is_authenticated %}
           <a class="button outline" href="{% url 'abuse_report' report.pk %}">الإبلاغ عن محتوى مخالف</a>
         {% endif %}
-        <button class="button secondary" type="button" onclick="navigator.clipboard.writeText(window.location.href); alert('تم نسخ رابط البلاغ المباشر بنجاح! يمكنك الآن مشاركته عبر الواتساب أو شبكات التواصل.');" style="margin-top: 4px; display: flex; align-items: center; justify-content: center; gap: 8px;">
-          <svg viewBox="0 0 24 24" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2;"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
-          مشاركة البلاغ (نسخ الرابط المباشر للواتساب والشبكات)
-        </button>
+        <p class="muted" style="font-size: 13px; margin: 6px 0 0;">
+          لمشاركة هذا البلاغ بأمان، انسخ رابط الصفحة من شريط العنوان في متصفحك.
+        </p>
       </div>
     {% endif %}
   {% endif %}

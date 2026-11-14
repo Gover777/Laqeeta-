@@ -1,3 +1,4 @@
+import importlib.util
 import os
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -33,12 +34,14 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "core.proxy.EdgeProxyMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "core.security_headers.SecurityHeadersMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "core.security_headers.AdminRateLimitMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "core.auth_gate.PublicAuthGateMiddleware",
 ]
@@ -63,6 +66,16 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
+_DEFAULT_HASHERS = [
+    "django.contrib.auth.hashers.PBKDF2PasswordHasher",
+    "django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",
+    "django.contrib.auth.hashers.ScryptPasswordHasher",
+]
+if importlib.util.find_spec("argon2") is not None:
+    PASSWORD_HASHERS = ["django.contrib.auth.hashers.Argon2PasswordHasher", *_DEFAULT_HASHERS]
+else:
+    PASSWORD_HASHERS = _DEFAULT_HASHERS
+PASSWORD_RESET_TIMEOUT = 1800  # 30 minutes expiration for password reset & verification tokens
 LANGUAGE_CODE = "ar"
 TIME_ZONE = os.environ.get("DJANGO_TIME_ZONE", "Asia/Aden")
 USE_I18N = True
@@ -86,6 +99,7 @@ SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_SAMESITE = "Lax"
+SESSION_COOKIE_AGE = 604800  # 7 days
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = "DENY"
 SECURE_REFERRER_POLICY = "same-origin"
@@ -99,6 +113,8 @@ SECURE_HSTS_PRELOAD = False
 
 # Uploads are deliberately disabled until a reviewed, private, persistent storage backend exists.
 PHOTO_UPLOADS_ENABLED = os.environ.get("PHOTO_UPLOADS_ENABLED", "false").lower() in {"1", "true", "yes"}
+DATA_UPLOAD_MAX_MEMORY_SIZE = 6 * 1024 * 1024
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024
 MEDIA_ROOT = Path(os.environ.get("PRIVATE_MEDIA_ROOT") or str(BASE_DIR / "private_media"))
 MEDIA_URL = "/private-media/"
 
@@ -135,6 +151,8 @@ if not DEBUG:
         raise RuntimeError("Production requires DATABASE_URL using PostgreSQL.")
     if not SITE_URL or not _is_https_origin(SITE_URL):
         raise RuntimeError("Production SITE_URL must be an HTTPS origin with no credentials, path, query, or fragment.")
+    if not PUBLIC_BASE_URL or not _is_https_origin(PUBLIC_BASE_URL):
+        raise RuntimeError("Production PUBLIC_BASE_URL must be an HTTPS origin with no credentials, path, query, or fragment.")
     if not _csrf_origins_env or not CSRF_TRUSTED_ORIGINS or not all(_is_https_origin(origin) for origin in CSRF_TRUSTED_ORIGINS):
         raise RuntimeError("Production requires explicit HTTPS-only DJANGO_CSRF_TRUSTED_ORIGINS containing origins only.")
     if PUBLIC_AUTH_ENABLED:
@@ -146,3 +164,26 @@ if not DEBUG:
             raise RuntimeError("DEFAULT_FROM_EMAIL must use the explicitly verified RESEND_SENDING_DOMAIN.")
     if PHOTO_UPLOADS_ENABLED:
         raise RuntimeError("PHOTO_UPLOADS_ENABLED must remain false in production until private persistent media storage is configured.")
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "security": {
+            "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "security",
+        },
+    },
+    "loggers": {
+        "core.security": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
+}

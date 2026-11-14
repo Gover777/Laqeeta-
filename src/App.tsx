@@ -56,6 +56,7 @@ import {
   loginWithGoogle,
   logoutUser,
   onAuthStateChanged,
+  sendEmailVerification,
   testFirestoreConnection,
   handleFirestoreError,
   OperationType,
@@ -72,10 +73,12 @@ import {
   getDoc,
   setDoc,
   addDoc,
+  query,
+  where,
   onSnapshot
 } from 'firebase/firestore';
 
-const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || 'AIzaSyDCkF6Jdc3aRBirrLcH6ID1vP3qW59GT2M';
+const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
 
 
 interface UserProfile {
@@ -324,6 +327,17 @@ export function ReportsMap({ reports, isDarkMode, onSelectReport }: ReportsMapPr
 
       {/* LIVE GOOGLE MAPS VIEWPORT CONTAINER */}
       <div className="w-full h-[400px] md:h-[460px] relative">
+        {!GOOGLE_MAPS_API_KEY ? (
+          <div className={`w-full h-full min-h-[350px] flex flex-col items-center justify-center p-6 text-center ${
+            isDarkMode ? 'bg-[#141D17] text-[#F0E4CC]' : 'bg-[#F7F7F3] text-[#173F35]'
+          }`}>
+            <Compass className="w-12 h-12 text-[#B99A65] mb-2" />
+            <h5 className="font-black text-sm mb-1">خريطة المفقودات والموجودات حضرموت</h5>
+            <p className="text-xs text-[#59635D] max-w-xs leading-relaxed">
+              تتطلب الخريطة التفاعلية ضبط متغير البيئة VITE_GOOGLE_MAPS_API_KEY. يمكنك تصفح كافة البلاغات من القوائم أدناه.
+            </p>
+          </div>
+        ) : (
         <MapErrorBoundary isDarkMode={isDarkMode}>
           <APIProvider apiKey={GOOGLE_MAPS_API_KEY}>
             <Map
@@ -357,6 +371,7 @@ export function ReportsMap({ reports, isDarkMode, onSelectReport }: ReportsMapPr
             </Map>
           </APIProvider>
         </MapErrorBoundary>
+        )}
 
         {/* SELECTED PIN POPUP CARD OVERLAY */}
         {selectedPinReport && (
@@ -464,14 +479,14 @@ export default function App() {
       owner: {
         id: 'usr-demo-1',
         name: 'أحمد السعيد (صاحب مفقودات)',
-        email: 'ahmed@laqeeta.local',
+        email: '',
         isVerified: true,
         dateJoined: '2026-10-25',
       },
       involvedClaimant: {
         id: 'usr-demo-2',
         name: 'د. خالد المنصوري (عثر على غرض)',
-        email: 'khaled@laqeeta.local',
+        email: '',
         isVerified: true,
         dateJoined: '2026-10-26',
       },
@@ -489,14 +504,14 @@ export default function App() {
       owner: {
         id: 'usr-demo-2',
         name: 'د. خالد المنصوري (عثر على غرض)',
-        email: 'khaled@laqeeta.local',
+        email: '',
         isVerified: true,
         dateJoined: '2026-10-26',
       },
       involvedClaimant: {
         id: 'usr-demo-1',
         name: 'أحمد السعيد (صاحب مفقودات)',
-        email: 'ahmed@laqeeta.local',
+        email: '',
         isVerified: true,
         dateJoined: '2026-10-25',
       },
@@ -514,7 +529,7 @@ export default function App() {
       owner: {
         id: 'usr-demo-1',
         name: 'أحمد السعيد (صاحب مفقودات)',
-        email: 'ahmed@laqeeta.local',
+        email: '',
         isVerified: true,
         dateJoined: '2026-10-25',
       },
@@ -536,7 +551,7 @@ export default function App() {
               id: firebaseUser.uid,
               name: data.name || firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'مستخدم موثق',
               email: firebaseUser.email || '',
-              isVerified: firebaseUser.emailVerified || true,
+              isVerified: Boolean(firebaseUser.emailVerified),
               dateJoined: data.dateJoined || new Date().toISOString().split('T')[0],
             });
           } else {
@@ -544,7 +559,7 @@ export default function App() {
               id: firebaseUser.uid,
               name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'مستخدم جديد',
               email: firebaseUser.email || '',
-              isVerified: firebaseUser.emailVerified || true,
+              isVerified: Boolean(firebaseUser.emailVerified),
               dateJoined: new Date().toISOString().split('T')[0],
             };
             await setDoc(userRef, newUserProfile);
@@ -556,7 +571,7 @@ export default function App() {
             id: firebaseUser.uid,
             name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'مستخدم موثق',
             email: firebaseUser.email || '',
-            isVerified: true,
+            isVerified: Boolean(firebaseUser.emailVerified),
             dateJoined: new Date().toISOString().split('T')[0],
           });
         }
@@ -568,11 +583,14 @@ export default function App() {
     return () => unsubscribe();
   }, []);
 
-  // Real-time Firestore sync for reports
+  // Real-time Firestore sync for public reports (strictly filtered to published/closed, zero PII)
   useEffect(() => {
     try {
-      const reportsRef = collection(db, 'reports');
-      const unsubscribe = onSnapshot(reportsRef, (snapshot) => {
+      const publicReportsQuery = query(
+        collection(db, 'reports'),
+        where('status', 'in', ['published', 'closed'])
+      );
+      const unsubscribe = onSnapshot(publicReportsQuery, (snapshot) => {
         const loaded: ReportItem[] = [];
         snapshot.forEach((docSnap) => {
           const d = docSnap.data();
@@ -589,7 +607,7 @@ export default function App() {
             owner: {
               id: d.ownerId,
               name: d.ownerName || 'مستخدم',
-              email: d.ownerEmail || '',
+              email: '',
               isVerified: true,
               dateJoined: '',
             },
@@ -656,38 +674,53 @@ export default function App() {
 
     try {
       if (isSignUpMode) {
+        if (loginPassword.length < 12) {
+          setAuthError('يجب أن تتكون كلمة المرور من 12 حرفًا على الأقل لضمان أمان حسابك.');
+          return;
+        }
+        const safeDisplayName = signUpName.trim().slice(0, 100);
+        if (safeDisplayName.length < 2) {
+          setAuthError('يرجى إدخال اسم صحيح لا يقل عن حرفين.');
+          return;
+        }
         const credential = await createUserWithEmailAndPassword(auth, loginEmail.trim(), loginPassword);
-        if (signUpName.trim() && credential.user) {
-          await updateProfile(credential.user, { displayName: signUpName.trim() });
+        if (safeDisplayName && credential.user) {
+          await updateProfile(credential.user, { displayName: safeDisplayName });
+        }
+        if (credential.user) {
+          await sendEmailVerification(credential.user);
         }
         const newUserProfile: UserProfile = {
           id: credential.user.uid,
-          name: signUpName.trim() || credential.user.email?.split('@')[0] || 'مستخدم جديد',
+          name: safeDisplayName || credential.user.email?.split('@')[0] || 'مستخدم جديد',
           email: credential.user.email || '',
-          isVerified: true,
+          isVerified: false,
           dateJoined: new Date().toISOString().split('T')[0],
         };
         await setDoc(doc(db, 'users', credential.user.uid), newUserProfile);
         setCurrentUser(newUserProfile);
         setIsLoggedIn(true);
         setShowLoginGuidelinesModal(true);
-        setActionSuccessMessage('تم إنشاء حسابك الجديد وتسجيل الدخول بنجاح!');
+        setActionSuccessMessage('تم إنشاء الحساب! تم إرسال رابط تحقق لبريدك الإلكتروني — يرجى تأكيد بريدك قبل نشر البلاغات.');
         setActiveTab('dashboard');
       } else {
-        await signInWithEmailAndPassword(auth, loginEmail.trim(), loginPassword);
+        const credential = await signInWithEmailAndPassword(auth, loginEmail.trim(), loginPassword);
+        if (!credential.user.emailVerified) {
+          setAuthError('يرجى تأكيد بريدك الإلكتروني عبر رابط التحقق المرسل إليك قبل استخدام صلاحيات النشر.');
+        }
         setShowLoginGuidelinesModal(true);
         setActionSuccessMessage(`مرحبًا، تم تسجيل الدخول بنجاح!`);
         setActiveTab('dashboard');
       }
-      setTimeout(() => setActionSuccessMessage(''), 4000);
+      setTimeout(() => setActionSuccessMessage(''), 4500);
     } catch (err: any) {
       console.error("Email auth error:", err);
       if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
         setAuthError('بيانات الدخول غير صحيحة. يرجى التأكد من البريد الإلكتروني وكلمة المرور.');
       } else if (err.code === 'auth/email-already-in-use') {
-        setAuthError('هذا البريد الإلكتروني مستخدم بالفعل. يمكنك تسجيل الدخول بدلاً من ذلك.');
+        setAuthError('تعذر إتمام التسجيل بهذا البريد الإلكتروني. تأكد من البيانات أو سجل الدخول.');
       } else if (err.code === 'auth/weak-password') {
-        setAuthError('كلمة المرور ضعيفة. يرجى إدخال 6 أحرف على الأقل.');
+        setAuthError('كلمة المرور ضعيفة. يرجى إدخال كلمة مرور قوية من 12 حرفًا على الأقل.');
       } else {
         setAuthError('تعذر إكمال العملية. يرجى التأكد من البيانات أو استخدام تسجيل الدخول عبر Google.');
       }
@@ -708,31 +741,50 @@ export default function App() {
     }
   };
 
-  // Handle creating a new report with Firestore persistence
+  // Handle creating a new report with Firestore persistence & strict verification
   const handleCreateReport = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newTitle || !newDescription) return;
+    const cleanTitle = newTitle.trim();
+    const cleanDescription = newDescription.trim();
+    const cleanGovernorate = newGovernorate.trim();
+    const cleanCity = (newCity.trim() || 'المدينة الرئيسية');
 
-    const userProfile = currentUser || {
-      id: auth.currentUser?.uid || 'usr-anon',
-      name: auth.currentUser?.displayName || auth.currentUser?.email?.split('@')[0] || 'مستخدم موثق',
-      email: auth.currentUser?.email || '',
-      isVerified: true,
-      dateJoined: new Date().toISOString().split('T')[0],
-    };
+    if (cleanTitle.length < 3 || cleanTitle.length > 150) {
+      setActionSuccessMessage('يجب أن يكون عنوان البلاغ بين 3 و 150 حرفًا.');
+      setTimeout(() => setActionSuccessMessage(''), 4000);
+      return;
+    }
+    if (cleanDescription.length < 10 || cleanDescription.length > 2000) {
+      setActionSuccessMessage('يجب أن يكون الوصف العام بين 10 و 2000 حرف.');
+      setTimeout(() => setActionSuccessMessage(''), 4000);
+      return;
+    }
+
+    if (!auth.currentUser || !currentUser) {
+      setShowNewReportModal(false);
+      setActiveTab('login');
+      setActionSuccessMessage('يجب تسجيل الدخول بحساب موثق لنشر بلاغ.');
+      setTimeout(() => setActionSuccessMessage(''), 4000);
+      return;
+    }
+
+    if (!auth.currentUser.emailVerified) {
+      setActionSuccessMessage('يرجى تفعيل بريدك الإلكتروني أولاً لتتمكن من نشر البلاغات.');
+      setTimeout(() => setActionSuccessMessage(''), 4500);
+      return;
+    }
 
     const newReportData = {
-      title: newTitle,
+      title: cleanTitle,
       kind: newKind,
-      category: newCategory,
-      governorate: newGovernorate,
-      city: newCity || 'المدينة الرئيسية',
+      category: newCategory.slice(0, 100),
+      governorate: cleanGovernorate.slice(0, 100),
+      city: cleanCity.slice(0, 150),
       eventDate: new Date().toISOString().split('T')[0],
       status: 'published',
-      publicDescription: newDescription,
-      ownerId: userProfile.id,
-      ownerName: userProfile.name,
-      ownerEmail: userProfile.email,
+      publicDescription: cleanDescription,
+      ownerId: auth.currentUser.uid,
+      ownerName: currentUser.name.slice(0, 100),
       createdAt: new Date().toISOString(),
     };
 
@@ -740,15 +792,15 @@ export default function App() {
       const docRef = await addDoc(collection(db, 'reports'), newReportData);
       const created: ReportItem = {
         id: docRef.id,
-        title: newTitle,
+        title: cleanTitle,
         kind: newKind,
-        category: newCategory,
-        governorate: newGovernorate,
-        city: newCity || 'المدينة الرئيسية',
-        eventDate: new Date().toISOString().split('T')[0],
+        category: newReportData.category,
+        governorate: newReportData.governorate,
+        city: newReportData.city,
+        eventDate: newReportData.eventDate,
         status: 'published',
-        publicDescription: newDescription,
-        owner: userProfile,
+        publicDescription: cleanDescription,
+        owner: { ...currentUser, email: '' },
       };
 
       setReports(prev => [created, ...prev]);
@@ -760,25 +812,9 @@ export default function App() {
       setTimeout(() => setActionSuccessMessage(''), 4000);
     } catch (err) {
       console.error("Error creating report:", err);
-      // Local fallback in state
-      const created: ReportItem = {
-        id: `rep-${Date.now()}`,
-        title: newTitle,
-        kind: newKind,
-        category: newCategory,
-        governorate: newGovernorate,
-        city: newCity || 'المدينة الرئيسية',
-        eventDate: new Date().toISOString().split('T')[0],
-        status: 'published',
-        publicDescription: newDescription,
-        owner: userProfile,
-      };
-      setReports(prev => [created, ...prev]);
-      setShowNewReportModal(false);
-      setNewTitle('');
-      setNewDescription('');
-      setActionSuccessMessage('تم نشر البلاغ بنجاح!');
-      setTimeout(() => setActionSuccessMessage(''), 4000);
+      setActionSuccessMessage('تعذر حفظ البلاغ في قاعدة البيانات. تأكد من صلاحيات الحساب والمحاولة مرة أخرى.');
+      setTimeout(() => setActionSuccessMessage(''), 4500);
+      handleFirestoreError(err, OperationType.CREATE, 'reports');
     }
   };
 

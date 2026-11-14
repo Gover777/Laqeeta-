@@ -87,7 +87,7 @@
                     <a class="button outline small" style="min-height: 32px; padding: 4px 10px; font-size: 12px;" href="{% url 'report_edit' report.pk %}">تعديل</a>
                     <form method="post" action="{% url 'report_close' report.pk %}" style="display: inline;">
                       {% csrf_token %}
-                      <button class="button danger small" style="min-height: 32px; padding: 4px 10px; font-size: 12px;" type="submit" onclick="return confirm('هل أنت متأكد من إغلاق هذا البلاغ؟ لن يظهر في نتائج البحث.');">إغلاق</button>
+                      <button class="button danger small" style="min-height: 32px; padding: 4px 10px; font-size: 12px;" type="submit">إغلاق</button>
                     </form>
                   {% endif %}
                   {% if report.status == 'published' %}
@@ -133,7 +133,7 @@
           <span class="eyebrow">بلاغ: {{ thread.report.title }}</span>
           <h3 style="margin: 4px 0 8px;">
             <a href="{% url 'conversation' thread.pk %}">
-              مع: {% if request.user == thread.claimant %}{{ thread.owner.display_name|default:thread.owner.email }}{% else %}{{ thread.claimant.display_name|default:thread.claimant.email }}{% endif %}
+              مع: {% if request.user == thread.claimant %}{{ thread.owner.display_name|default:"عضو لقيتة" }}{% else %}{{ thread.claimant.display_name|default:"عضو لقيتة" }}{% endif %}
             </a>
           </h3>
           <p class="muted" style="font-size: 13px;">تواصل خاص وآمن داخل منصة لقيتة.</p>
