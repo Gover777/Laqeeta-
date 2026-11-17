@@ -444,7 +444,7 @@ export default function App() {
   }, []);
 
   // Navigation tabs
-  const [activeTab, setActiveTab] = useState<'home' | 'lost' | 'found' | 'safety' | 'dashboard' | 'backend' | 'login'>('home');
+  const [activeTab, setActiveTab] = useState<'home' | 'lost' | 'found' | 'safety' | 'verification' | 'dashboard' | 'backend' | 'login'>('home');
 
 
   // Active theme (persisted in state)
@@ -1121,100 +1121,60 @@ export default function App() {
             )}
           </section>
 
-          {/* HOW IT WORKS SECTION */}
-          <section className={`py-16 border-y my-12 transition-colors ${isDarkMode ? 'bg-[#1D2821] border-[#34463A]' : 'bg-[#F7F7F3] border-[#E3E7E0]'}`}>
+          {/* HOW IT WORKS SECTION (Dark Green) */}
+          <section className="bg-[#173F35] text-white py-14 md:py-16 my-12 transition-colors">
             <div className="max-w-6xl mx-auto px-4">
               <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
                 <div>
                   <p className="text-xs font-black text-[#B99A65]">خطوات بسيطة، بوضوح وثقة</p>
-                  <h2 className={`text-3xl font-black ${isDarkMode ? 'text-[#F0E4CC]' : 'text-[#173F35]'}`}>كيف تعمل المنصة؟</h2>
+                  <h2 className="text-3xl font-black text-[#F0E4CC]">كيف تعمل المنصة؟</h2>
                 </div>
-                <p className={`text-sm max-w-md ${isDarkMode ? 'text-[#C7D0C8]' : 'text-[#59635D]'}`}>مسار مقترح يساعد الطرفين على التحرك بوضوح، من دون اعتبار التشابه إثباتًا للملكية.</p>
+                <p className="text-sm max-w-md text-[#F0E4CC]/80">مسار مقترح يساعد الطرفين على التحرك بوضوح، من دون اعتبار التشابه إثباتًا للملكية.</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className={`p-7 rounded-3xl border relative shadow-sm transition-colors ${isDarkMode ? 'bg-[#19231D] border-[#34463A]' : 'bg-white border-[#E3E7E0]'}`}>
+                <div className="bg-[#0F2D26] p-7 rounded-3xl border border-[#B99A65]/40 relative shadow-md transition-colors">
                   <span className="absolute top-6 left-6 text-2xl font-black text-[#B99A65]">01</span>
                   <div className="w-12 h-12 rounded-2xl bg-[#F0E4CC] text-[#121915] flex items-center justify-center font-black mb-5">
                     <FileText className="w-6 h-6 text-[#121915]" />
                   </div>
-                  <h3 className={`text-xl font-black mb-2 ${isDarkMode ? 'text-[#F0E4CC]' : 'text-[#173F35]'}`}>أبلغ أو ابحث</h3>
-                  <p className={`text-xs md:text-sm leading-relaxed ${isDarkMode ? 'text-[#C7D0C8]' : 'text-[#59635D]'}`}>
+                  <h3 className="text-xl font-black mb-2 text-[#F0E4CC]">أبلغ أو ابحث</h3>
+                  <p className="text-xs md:text-sm leading-relaxed text-[#F0E4CC]/75">
                     ابحث بسهولة عما فقدته باستخدام محرك البحث حسب التصنيف، أو انشر بلاغًا عن غرض عثرت عليه بوصف عام آمن.
                   </p>
                 </div>
 
-                <div className={`p-7 rounded-3xl border relative shadow-sm transition-colors ${isDarkMode ? 'bg-[#19231D] border-[#34463A]' : 'bg-white border-[#E3E7E0]'}`}>
+                <div className="bg-[#0F2D26] p-7 rounded-3xl border border-[#B99A65]/40 relative shadow-md transition-colors">
                   <span className="absolute top-6 left-6 text-2xl font-black text-[#B99A65]">02</span>
-                  <div className="w-12 h-12 rounded-2xl bg-[#173F35] text-[#F0E4CC] flex items-center justify-center font-black mb-5">
+                  <div className="w-12 h-12 rounded-2xl bg-[#173F35] border border-[#B99A65]/30 text-[#F0E4CC] flex items-center justify-center font-black mb-5">
                     <MessageSquare className="w-6 h-6 text-[#F0E4CC]" />
                   </div>
-                  <h3 className={`text-xl font-black mb-2 ${isDarkMode ? 'text-[#F0E4CC]' : 'text-[#173F35]'}`}>تواصل بأمان</h3>
-                  <p className={`text-xs md:text-sm leading-relaxed ${isDarkMode ? 'text-[#C7D0C8]' : 'text-[#59635D]'}`}>
+                  <h3 className="text-xl font-black mb-2 text-[#F0E4CC]">تواصل بأمان</h3>
+                  <p className="text-xs md:text-sm leading-relaxed text-[#F0E4CC]/75">
                     ابدأ محادثة داخلية مع صاحب البلاغ دون الحاجة إلى نشر بياناتك الشخصية أو رقم هاتفك حتى يتم تأكيد المطابقة.
                   </p>
                 </div>
 
-                <div className={`p-7 rounded-3xl border relative shadow-sm transition-colors ${isDarkMode ? 'bg-[#19231D] border-[#34463A]' : 'bg-white border-[#E3E7E0]'}`}>
+                <div className="bg-[#0F2D26] p-7 rounded-3xl border border-[#B99A65]/40 relative shadow-md transition-colors">
                   <span className="absolute top-6 left-6 text-2xl font-black text-[#B99A65]">03</span>
                   <div className="w-12 h-12 rounded-2xl bg-[#B99A65] text-[#121915] flex items-center justify-center font-black mb-5">
                     <CheckCircle2 className="w-6 h-6 text-[#121915]" />
                   </div>
-                  <h3 className={`text-xl font-black mb-2 ${isDarkMode ? 'text-[#F0E4CC]' : 'text-[#173F35]'}`}>تحقق واستلم</h3>
-                  <p className={`text-xs md:text-sm leading-relaxed ${isDarkMode ? 'text-[#C7D0C8]' : 'text-[#59635D]'}`}>
+                  <h3 className="text-xl font-black mb-2 text-[#F0E4CC]">تحقق واستلم</h3>
+                  <p className="text-xs md:text-sm leading-relaxed text-[#F0E4CC]/75">
                     تأكد من مطابقة التفاصيل السرية قبل التسليم في مكان عام، واستلم أمانتك بكل يسر وسهولة.
                   </p>
                 </div>
               </div>
-            </div>
-          </section>
 
-          {/* SAFETY & PRIVACY SECTION (Dark Green) */}
-          <section className="bg-[#173F35] text-white py-14 md:py-16">
-            <div className="max-w-7xl mx-auto px-4 md:px-8 space-y-10">
-              <div className="text-center max-w-3xl mx-auto space-y-3">
-                <span className="inline-block text-xs font-black text-[#173F35] bg-[#F0E4CC] px-3 py-1 rounded-full">الخصوصية والسلامة أولاً</span>
-                <h2 className="text-3xl md:text-4xl font-black text-[#F0E4CC] tracking-tight">
-                  التطابق بداية التحقق، وليس نهايته
-                </h2>
-                <p className="text-xs md:text-sm text-[#F0E4CC]/80 leading-relaxed font-medium">
-                  إعلان يشير إلى تطابق لا يعني ملكية مؤكدة. شارك التفاصيل بحذر، واعتمد على الخطوات الإرشادية التالية قبل التسليم:
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-[#0F2D26] p-6 rounded-3xl border border-[#B99A65]/40 space-y-3 relative shadow-md">
-                  <div className="flex items-center justify-between">
-                    <span className="w-8 h-8 rounded-xl bg-[#F0E4CC] text-[#173F35] font-black text-xs flex items-center justify-center">01</span>
-                    <Lock className="w-6 h-6 text-[#B99A65]" />
-                  </div>
-                  <h4 className="font-black text-base text-[#F0E4CC]">احتفظ بتفاصيل التحقق</h4>
-                  <p className="text-xs text-[#F0E4CC]/75 leading-relaxed font-normal">لا تذكر الأرقام التسلسلية أو العلامات الفريدة في الوصف العام.</p>
-                </div>
-
-                <div className="bg-[#0F2D26] p-6 rounded-3xl border border-[#B99A65]/40 space-y-3 relative shadow-md">
-                  <div className="flex items-center justify-between">
-                    <span className="w-8 h-8 rounded-xl bg-[#F0E4CC] text-[#173F35] font-black text-xs flex items-center justify-center">02</span>
-                    <ShieldCheck className="w-6 h-6 text-[#B99A65]" />
-                  </div>
-                  <h4 className="font-black text-base text-[#F0E4CC]">لا تنشر وثائق حساسة</h4>
-                  <p className="text-xs text-[#F0E4CC]/75 leading-relaxed font-normal">تجنب صور الهويات والبطاقات البنكية وأرقام الهواتف علنًا.</p>
-                </div>
-
-                <div className="bg-[#0F2D26] p-6 rounded-3xl border border-[#B99A65]/40 space-y-3 relative shadow-md">
-                  <div className="flex items-center justify-between">
-                    <span className="w-8 h-8 rounded-xl bg-[#F0E4CC] text-[#173F35] font-black text-xs flex items-center justify-center">03</span>
-                    <MapPin className="w-6 h-6 text-[#B99A65]" />
-                  </div>
-                  <h4 className="font-black text-base text-[#F0E4CC]">اختر مكانًا عامًا</h4>
-                  <p className="text-xs text-[#F0E4CC]/75 leading-relaxed font-normal">التقِ في مراكز تجارية أو بهو جامعة أو مراكز عامة مضيئة.</p>
-                </div>
-              </div>
-
-              <div className="text-center pt-2">
+              <div className="text-center pt-10">
                 <button
-                  onClick={() => setActiveTab('safety')}
-                  className="inline-flex items-center gap-2 text-xs font-black text-[#173F35] bg-[#F0E4CC] px-6 py-3 rounded-2xl hover:bg-[#B99A65] transition shadow-md"
+                  type="button"
+                  onClick={() => {
+                    setActiveTab('verification');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className="inline-flex items-center gap-2 text-xs font-black text-[#173F35] bg-[#F0E4CC] px-6 py-3 rounded-2xl hover:bg-[#B99A65] transition shadow-md cursor-pointer"
                 >
                   <span>اقرأ إرشادات السلامة والتحقق الكاملة</span>
                   <ArrowLeft className="w-4 h-4" />
@@ -1591,6 +1551,83 @@ export default function App() {
         )}
       </main>
     )}
+
+      {/* VERIFICATION MATCH GUIDE PAGE (التطابق بداية التحقق، وليس نهايته) */}
+      {activeTab === 'verification' && (
+        <main className="max-w-6xl mx-auto px-4 md:px-8 py-12">
+          <div className="space-y-8">
+            <button
+              type="button"
+              onClick={() => setActiveTab('home')}
+              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition border cursor-pointer ${
+                isDarkMode
+                  ? 'bg-[#19231D] text-[#F0E4CC] border-[#34463A] hover:bg-[#223128]'
+                  : 'bg-[#F7F7F3] text-[#173F35] border-[#E3E7E0] hover:bg-[#E3E7E0]'
+              }`}
+            >
+              <ArrowRight className="w-4 h-4 text-[#B99A65]" />
+              <span>رجوع للصفحة الرئيسية</span>
+            </button>
+
+            <div className="space-y-3 border-b pb-6 border-[#E3E7E0]/60">
+              <span className="inline-block text-xs font-black text-[#B99A65]">الخصوصية والسلامة أولاً</span>
+              <h1 className={`text-3xl md:text-4xl font-black tracking-tight ${isDarkMode ? 'text-[#F0E4CC]' : 'text-[#173F35]'}`}>
+                التطابق بداية التحقق، وليس نهايته
+              </h1>
+              <p className={`text-sm max-w-2xl leading-relaxed ${isDarkMode ? 'text-[#C7D0C8]' : 'text-[#59635D]'}`}>
+                إعلان يشير إلى تطابق لا يعني ملكية مؤكدة. شارك التفاصيل بحذر، واعتمد على الخطوات الإرشادية التالية قبل التسليم:
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className={`p-7 rounded-3xl border shadow-sm space-y-4 transition-colors ${isDarkMode ? 'bg-[#19231D] border-[#34463A]' : 'bg-white border-[#E3E7E0]'}`}>
+                <div className="flex items-center justify-between">
+                  <span className="w-9 h-9 rounded-xl bg-[#173F35] text-[#F0E4CC] font-black text-xs flex items-center justify-center">01</span>
+                  <div className="w-10 h-10 rounded-xl bg-[#F0E4CC]/60 flex items-center justify-center">
+                    <Lock className="w-5 h-5 text-[#173F35]" />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <h2 className={`font-black text-lg ${isDarkMode ? 'text-[#F0E4CC]' : 'text-[#173F35]'}`}>احتفظ بتفاصيل التحقق</h2>
+                  <p className={`text-xs md:text-sm leading-relaxed ${isDarkMode ? 'text-[#C7D0C8]' : 'text-[#59635D]'}`}>
+                    لا تذكر الأرقام التسلسلية أو العلامات الفريدة في الوصف العام.
+                  </p>
+                </div>
+              </div>
+
+              <div className={`p-7 rounded-3xl border shadow-sm space-y-4 transition-colors ${isDarkMode ? 'bg-[#19231D] border-[#34463A]' : 'bg-white border-[#E3E7E0]'}`}>
+                <div className="flex items-center justify-between">
+                  <span className="w-9 h-9 rounded-xl bg-[#173F35] text-[#F0E4CC] font-black text-xs flex items-center justify-center">02</span>
+                  <div className="w-10 h-10 rounded-xl bg-[#F0E4CC]/60 flex items-center justify-center">
+                    <ShieldCheck className="w-5 h-5 text-[#173F35]" />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <h2 className={`font-black text-lg ${isDarkMode ? 'text-[#F0E4CC]' : 'text-[#173F35]'}`}>لا تنشر وثائق حساسة</h2>
+                  <p className={`text-xs md:text-sm leading-relaxed ${isDarkMode ? 'text-[#C7D0C8]' : 'text-[#59635D]'}`}>
+                    تجنب صور الهويات والبطاقات البنكية وأرقام الهواتف علنًا.
+                  </p>
+                </div>
+              </div>
+
+              <div className={`p-7 rounded-3xl border shadow-sm space-y-4 transition-colors ${isDarkMode ? 'bg-[#19231D] border-[#34463A]' : 'bg-white border-[#E3E7E0]'}`}>
+                <div className="flex items-center justify-between">
+                  <span className="w-9 h-9 rounded-xl bg-[#173F35] text-[#F0E4CC] font-black text-xs flex items-center justify-center">03</span>
+                  <div className="w-10 h-10 rounded-xl bg-[#F0E4CC]/60 flex items-center justify-center">
+                    <MapPin className="w-5 h-5 text-[#173F35]" />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <h2 className={`font-black text-lg ${isDarkMode ? 'text-[#F0E4CC]' : 'text-[#173F35]'}`}>اختر مكانًا عامًا</h2>
+                  <p className={`text-xs md:text-sm leading-relaxed ${isDarkMode ? 'text-[#C7D0C8]' : 'text-[#59635D]'}`}>
+                    التقِ في مراكز تجارية أو بهو جامعة أو مراكز عامة مضيئة.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      )}
 
       {/* SAFETY GUIDE TAB */}
       {activeTab === 'safety' && (
